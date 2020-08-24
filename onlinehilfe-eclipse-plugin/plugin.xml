@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension point="org.eclipse.ui.editors">
+      <editor
+            class="onlinehilfe.parts.HtmlEditor"
+            extensions="html, htm"
+            icon="$nl$/icons/sample.gif"
+            id="onlinehilfe.parts.htmlEditor"
+            name="JODID HTML Editor"
+            default="true">
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="onlinehilfe.preferences.HtmlEditorPreferencePage"
+            id="onlinehilfe.preferences.HtmlEditorPreferencePage"
+            name="HTML Editor Preferences">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="onlinehilfe.preferences.PreferenceInitializer">
+      </initializer>
+   </extension>
+   
+   <extension point="org.eclipse.ui.actionSets">
+	   <actionSet
+	      	id="onlinehilfe.action.set"
+	      	label="Onlinehilfe Build Bar"
+	      	visible="true">
+	      <action
+	         	id="onlinehilfe.action.set.actionBuild1Html" 
+	         	label="Baut alles fertig" 
+	         	icon="$nl$/icons/buildHtml.gif"
+	         	tooltip="Erstellt HTML"
+	         	toolbarPath="Normal/additions"
+	         	class="onlinehilfe.action.BuildHtmlAction"> 
+	      </action>
+	      <action
+	         	id="onlinehilfe.action.set.actionBuild2Chm" 
+	         	label="Baut alles fertig" 
+	         	icon="$nl$/icons/buildChm.gif"
+	         	tooltip="Erstellt CHM"
+	         	toolbarPath="Normal/additions"
+	         	class="onlinehilfe.action.BuildChmAction"> 
+	      </action>
+	      <action
+	         	id="onlinehilfe.action.set.actionBuild3Pdf" 
+	         	label="Baut alles fertig" 
+	         	icon="$nl$/icons/buildPdf.gif"
+	         	tooltip="Erstellt PDF"
+	         	toolbarPath="Normal/additions"
+	         	class="onlinehilfe.action.BuildPdfAction"> 
+	      </action>  
+	   </actionSet> 
+   </extension>
+   
+   <extension
+      point="org.eclipse.core.resources.natures" id="onlinehilfeNature" name="Onlinehilfe Nature">
+      <runtime>
+         <run class="onlinehilfe.navigator.OnlinehilfeNature"></run>
+      </runtime>
+   </extension>
+   <!-- <extension point="org.eclipse.ui.ide.projectNatureImages">
+      <imageicon="$nl$/icons/nav.png" natureId="onlinehilfeNature" id="onlinehilfeNatureImage"></image>
+   </extension> -->
+   
+   <extension point="org.eclipse.ui.navigator.navigatorContent">
+      <navigatorContent 
+            activeByDefault="true" 
+            contentProvider="onlinehilfe.navigator.OnlinehilfeNavigatorContentProvider"
+            labelProvider="onlinehilfe.navigator.OnlinehilfeNavigatorLabelProvider" 
+            id="onlinehilfe.navigator.navigatorContent"
+            icon="icons/nav.png"
+            name="Onlinehilfe Navigator Content">
+        <triggerPoints>
+		    <or>
+               <adapt type="org.eclipse.core.resources.IProject" >
+                  <test property="org.eclipse.core.resources.projectNature" value="onlinehilfe.onlinehilfeNature"/>
+			   </adapt>
+		       
+		       <instanceof value="onlinehilfe.navigator.IOnlinehilfeElement"/>
+               <instanceof value="org.eclipse.core.resources.IFile" />
+		       
+		    </or>
+         </triggerPoints>
+         <possibleChildren>
+            <or>
+               <instanceof value="onlinehilfe.navigator.IOnlinehilfeElement"/>
+               <instanceof value="org.eclipse.core.resources.IFile"/>
+            </or>
+         </possibleChildren>
+         
+         <commonSorter
+               class="onlinehilfe.navigator.OnlinehilfeElementSorter"
+               id="onlinehilfe.navigator.OnlinehilfeElementSorter">
+            <parentExpression>
+               <or>
+                  <adapt type="onlinehilfe.navigator.IOnlinehilfeElement"/>
+               </or>
+            </parentExpression>
+         </commonSorter>
+         
+         <actionProvider
+               class="onlinehilfe.navigator.OnlinehilfeNavigatorActionProvider"
+               id="onlinehilfe.navigator.actionProvider">
+         </actionProvider>
+         
+      </navigatorContent>
+   </extension>
+      
+   <extension point="org.eclipse.ui.navigator.viewer">
+      <viewerContentBinding viewerId="org.eclipse.ui.navigator.ProjectExplorer">
+         <includes>
+            <contentExtension pattern="onlinehilfe.navigator.navigatorContent"/>
+         </includes>
+      </viewerContentBinding>
+   </extension>
+
+<extension point="org.eclipse.ui.viewActions"> 
+	<viewContribution id="org.eclipse.ui.articles.action.contribution.view" 
+			targetID="org.eclipse.ui.navigator.ProjectExplorer">
+		<filter name="projectNature" 
+				value="onlinehilfeNature">
+		</filter>
+	    <action id="onlinehilfe.navigator.onlinehilfe.navigator.action.up" 
+	    		label="nach oben schieben"
+	    		icon="icons/move-up.png"
+	    		tooltip="nach oben schieben"
+	    		toolbarPath="group1"
+	    		enabledFor="*"
+	    		menubarPath="additions"
+	    		class="onlinehilfe.navigator.actions.OnlinehilfeNavigatorViewActionUp">
+			<selection
+            		class="onlinehilfe.navigator.IOnlinehilfeElement"
+            		name="*">
+        	</selection> 
+		</action>
+		<action id="onlinehilfe.navigator.onlinehilfe.navigator.action.down" 
+	    		label="nach unten schieben"
+	    		icon="icons/move-down.png"
+	    		tooltip="nach untern schieben"
+	    		toolbarPath="group1"
+	    		enabledFor="*"
+	    		menubarPath="additions"
+	    		class="onlinehilfe.navigator.actions.OnlinehilfeNavigatorViewActionDown">
+			<selection
+            		class="onlinehilfe.navigator.IOnlinehilfeElement"
+            		name="*">
+        	</selection> 
+		</action>
+		<action id="onlinehilfe.navigator.onlinehilfe.navigator.action.in" 
+	    		label="nach innen schieben"
+	    		icon="icons/move-in.png"
+	    		tooltip="nach innen schieben"
+	    		toolbarPath="group1"
+	    		enabledFor="*"
+	    		menubarPath="additions"
+	    		class="onlinehilfe.navigator.actions.OnlinehilfeNavigatorViewActionIn">
+			<selection
+            		class="onlinehilfe.navigator.IOnlinehilfeElement"
+            		name="*">
+        	</selection> 
+		</action>
+		<action id="onlinehilfe.navigator.onlinehilfe.navigator.action.out" 
+	    		label="nach außen schieben"
+	    		icon="icons/move-out.png"
+	    		tooltip="nach außen schieben"
+	    		toolbarPath="group1"
+	    		enabledFor="*"
+	    		menubarPath="additions"
+	    		class="onlinehilfe.navigator.actions.OnlinehilfeNavigatorViewActionOut">
+			<selection
+            		class="onlinehilfe.navigator.IOnlinehilfeElement"
+            		name="*">
+        	</selection> 
+		</action>
+
+		
+	</viewContribution > 
+</extension>
+
+</plugin>

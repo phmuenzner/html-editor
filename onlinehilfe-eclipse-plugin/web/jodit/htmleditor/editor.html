@@ -1,0 +1,223 @@
+<!doctype html>
+<!--
+ * Jodit Editor (https://xdsoft.net/jodit/)
+ * License GNU General Public License version 2 or later;
+ * Copyright 2013-2020 Valeriy Chupurnov https://xdsoft.net
+-->
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+       
+    <link rel="stylesheet" href="../build/jodit.min.css"/>
+	<link rel="stylesheet" href="/_styles/app.css"/>
+    
+</head>
+<body>
+<div id="main_container" class="container">
+    <div class="result">
+        <textarea id="area_editor"></textarea>
+    </div>
+</div>
+
+<!-- <script src="../build/jodit.min.js"></script> -->
+<script src="../build/jodit.js"></script>
+<script src="assets/app.js"></script>
+<script>
+	var _path = null;
+    var persistetContent;
+
+    var contentChanged = false;
+    
+    function evaluateContentToSave() {
+		persistetContent=editor.getEditorValue();
+		contentChanged = false
+		return persistetContent;
+    }    		
+
+    function evaluateContentOnLoad(content) {
+    	editor.setEditorValue(content);
+   	 	persistetContent=editor.getEditorValue();
+		contentChanged = false
+    }
+    
+    function b64DecodeUnicode(str) {
+        return decodeURIComponent(atob(str).split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+    }
+
+	function loadContent(path, editor) {
+		if (path == null) {
+			return;
+		}
+		
+		_path = path;
+		
+	    var xhttp = new XMLHttpRequest();
+	    xhttp.onreadystatechange = function() {
+	         if (this.readyState == 4 && this.status == 200) {
+	        	 editor.setEditorValue(this.responseText);
+	        	 persistetContent=editor.getEditorValue();
+	         }
+	    };
+	    xhttp.open("GET", "/content/get/" + _path, true);
+	    xhttp.setRequestHeader("Content-type", "text/html");
+	    xhttp.send();
+
+	}
+
+    function findGetParameter(parameterName) {
+	    var result = null,
+	        tmp = [];
+	    var items = location.search.substr(1).split("&");
+	    for (var index = 0; index < items.length; index++) {
+	        tmp = items[index].split("=");
+	        if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1]);
+	    }
+	    return result;
+	}
+	    
+    Jodit.plugins.add('changedEvent', function(editor) {
+            editor.events.on('change.textLength', function() {
+            	console.log('contentChanged');
+            	if (!contentChanged) {
+            		contentChanged = checkChangedContent();
+            	}
+            });
+            editor.events.on('afterInit', function () {
+            	contentChanged = false;
+            });
+    });
+
+    Jodit.plugins.add('moveEvent', function(editor) {
+            editor.events.on('startMove', function() {
+				alert("-startMove");
+            	//editor.setEditorValue(editor.getEditorValue() + "-startMove")
+            });
+/*
+			editor.events.on('move', function() {
+            	editor.setEditorValue(editor.getEditorValue() + "-move")
+            });
+			editor.events.on('endMove', function() {
+            	editor.setEditorValue(editor.getEditorValue() + "-endMove")
+				
+            });
+  */          
+    });
+
+	/*Jodit.plugins.add('titleOverToolbar', function (editor) {
+		var titleOverToolbarDiv = document.createElement('div');
+	    innerTitle.setAttribute('class', 'jodid-plugin--title-over-toolbar');
+
+    	editor.events.on('afterInit', function () {
+        	editor.container.insertBefore(titleOverToolbarDiv, editor.container.firstChild);
+			titleOverToolbarDiv.innerHTML = "blah";
+    	});
+	});*/
+
+    function checkChangedContent() {
+    	try {
+	    	return (persistetContent.localeCompare(editor.getEditorValue()) !== 0);
+    	} catch(err) {
+    		return false;
+    	}
+    }
+    
+    function hasChangedContent() {
+    	return contentChanged;
+    }
+        
+    var joditOptions = {
+    	"fullsize": true,
+		
+		"iframe": false,
+		"spellcheck": true,
+		"enableDragAndDropFileToEditor": false,
+
+		"language": "de", /*muss über Einstellung steuerbar sein*/
+		"imageDefaultWidth": "300", /*muss über Einstellung steuerbar sein*/
+		
+		"defaultMode": "1",
+    		
+		"disablePlugins": "tooltip,symbols,mobile,iframe,imageprocessor",
+
+		"buttons": "cut,copy,paste,|,bold,underline,italic,|,fontsize,brush,paragraph,|,ul,ol,align,outdent,indent,|,image,table,link,hr,|,undo,redo,|,source",
+
+    	//"beautifyHTML": false,
+		//"useAceEditor": false,
+		
+		"sourceEditorCDNUrlsJS": ["../dependencies/ace.js"],
+		"beautifyHTMLCDNUrlsJS": ["../dependencies/beautify.min.js", "../dependencies/beautify-html.min.js"],
+
+        uploader: {
+            url: 'file/upload',
+            format: 'json',
+            pathVariableName: 'path',
+            filesVariableName: function(t){return "files["+t+"]"},
+            prepareData: function (data) {
+                return data;
+            },
+            isSuccess: function (resp) {
+                return !resp.error;
+            },
+            getMsg: function (resp) {
+                return (resp.msg.join !== undefined) ? resp.msg.join(' ') : resp.msg;
+            },
+            process: function (resp) { 
+                return {
+                    files: resp.images,
+                    error: resp.error,
+                    message: resp.msg
+                }
+            },
+            defaultHandlerSuccess: function (data) {
+            	var i, field = 'files';                      
+                if (data[field] && data[field].length) {
+                    for (i = 0; i < data[field].length; i += 1) {
+                    	
+                    	this.selection.insertImage(data[field][i], null, this.jodit.options.imageDefaultWidth);
+                    }
+                }
+            }
+        },
+        filebrowser: {
+          	showFileSize: false,
+          	showFileChangeTime: false,
+          	editImage: false,
+          	preview:true,
+          	createNewFolder: false,
+         		 deleteFolder: false,
+          		moveFolder: false,
+          		moveFile: false,
+    		
+          		//Wenn false, dann zeigt es gar nichts bis die sortierungs Kriteria geändert wird.
+          		//Wenn true, bleibt stecken IE 11
+      		    showFoldersPanel: true,
+          		buttons: ['select', 'tiles', 'list'], 
+          ajax: {
+            async: true,
+        	    cache : true,
+            url: 'file/browse',
+            dataType: 'json'
+          }
+     }
+}
+    
+	var editor = new Jodit(document.getElementById('area_editor'), joditOptions);
+   
+	loadContent(findGetParameter("path"), editor);
+
+	//Title über editor schreiben
+/*	var joditToolbarContainer = document.getElementsByClassName('jodit_toolbar_container')[0]; //es gibt nur einen
+    var innerTitle = document.createElement('div');
+    innerTitle.innerHTML = document.title;
+	innerTitle.setAttribute('class', 'Title');
+	joditToolbarContainer.insertBefore(innerTitle, joditToolbarContainer.firstChild);
+	*/
+
+</script>
+
+</body>
+</html>

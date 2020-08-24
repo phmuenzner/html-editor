@@ -1,0 +1,26 @@
+#macro(tocNode $tocEntry)
+	<LI><OBJECT type="text/sitemap">
+			<param name="Name" value="$tocEntry.getTitle()">
+			<param name="Local" value="$tocEntry.getFilename()">
+	</OBJECT></LI>
+	#if ($tocEntry.getSubEntries().size() > 0)
+		<UL>
+			#foreach($subTocEntry in $tocEntry.getSubEntries())
+				#tocNode($subTocEntry)
+			#end	
+		</UL>
+	#end
+#end
+<HTML>
+<HEAD><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></HEAD>
+<BODY>
+
+	<OBJECT type="text/site properties">
+		<param name="ImageType" value="Folder">
+	</OBJECT>
+	<UL>
+	#foreach($tocEntry in $toc.getSubEntries())
+		#tocNode($tocEntry)
+	#end
+	</UL>
+</BODY></HTML>

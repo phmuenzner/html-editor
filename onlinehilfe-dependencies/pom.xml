@@ -1,0 +1,97 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>onlinehilfe</groupId>
+		<artifactId>onlinehilfe</artifactId>
+		<version>1.0.0</version>
+	</parent>
+
+	<artifactId>onlinehilfe-dependencies</artifactId>
+	<packaging>jar</packaging>
+
+	<dependencies>
+				
+		<dependency>
+			<groupId>org.apache.velocity</groupId>
+			<artifactId>velocity-engine-core</artifactId>
+			<version>2.2</version>
+		</dependency>
+
+		<!-- html to xhtml -->
+		<dependency>
+			<groupId>org.jsoup</groupId>
+			<artifactId>jsoup</artifactId>
+			<version>1.13.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.xmlgraphics</groupId>
+			<artifactId>fop</artifactId>
+			<version>2.3</version>
+		</dependency>
+
+	</dependencies>
+	  <build>
+	  <plugins>
+			<plugin>
+			    <groupId>org.apache.maven.plugins</groupId>
+			    <artifactId>maven-dependency-plugin</artifactId>
+			    <version>2.1</version>
+			    <configuration>
+		            <outputDirectory>${project.basedir}/../onlinehilfe-eclipse-plugin/libs</outputDirectory>
+		            <overWriteReleases>true</overWriteReleases>
+		            <overWriteSnapshots>true</overWriteSnapshots>
+		            <overWriteIfNewer>true</overWriteIfNewer>
+		        </configuration>
+			    <executions>
+			        <execution>
+				        <id>copy-dependencies</id>
+				        <phase>compile</phase>
+				        <goals>
+				            <goal>copy-dependencies</goal>
+				        </goals>
+			        </execution>
+			    </executions>
+			</plugin>
+	  </plugins>
+	  <pluginManagement>
+	  	<plugins>
+	  		<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+	  		<plugin>
+	  			<groupId>org.eclipse.m2e</groupId>
+	  			<artifactId>lifecycle-mapping</artifactId>
+	  			<version>1.0.0</version>
+	  			<configuration>
+	  				<lifecycleMappingMetadata>
+	  					<pluginExecutions>
+	  						<pluginExecution>
+	  							<pluginExecutionFilter>
+	  								<groupId>
+	  									org.apache.maven.plugins
+	  								</groupId>
+	  								<artifactId>
+	  									maven-dependency-plugin
+	  								</artifactId>
+	  								<versionRange>
+	  									[2.1,)
+	  								</versionRange>
+	  								<goals>
+	  									<goal>copy-dependencies</goal>
+	  								</goals>
+	  							</pluginExecutionFilter>
+	  							<action>
+	  								<ignore></ignore>
+	  							</action>
+	  						</pluginExecution>
+	  					</pluginExecutions>
+	  				</lifecycleMappingMetadata>
+	  			</configuration>
+	  		</plugin>
+	  	</plugins>
+	  </pluginManagement>
+  </build>
+	
+</project>

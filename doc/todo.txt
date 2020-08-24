@@ -1,0 +1,46 @@
+TODOs
+
+Offen:
+- Manueller Verweis auf web-verzeichnis des plugins automatisieren
+- Einstellungsoption für plugin definieren
+- Charset in Projekt definierbar
+- Umbau auf Tycho Projekt
+- Bundle bauen (Tim)
+- Demoworkspace aufsetzen
+- Navio
+
+
+Erledigt:
+- Einstellugnen zu Projekt hinzufügen
+   - Titel, Subtitel, Version, ...
+- Focus-Problem im Jodit Lösen (naja so teilweise done wenn man edge verwendet)
+- Focus für ImageUploader ist nicht in ordnung
+- Focus beim Verschieben von Elementen in Jodit-Editor geht nicht im SWTBrowser
+- ImageChooser mit zugriff auf bereits bekannte Bilder muss implementiert werden
+
+- FOP-Transformator
+	- Tabellen Rahmen...
+	- Tabellen Breiten sollen in PDF übernommen werden
+	- Farben nicht sauber (prinzipiell müssen auch mehrer Farben und andere optionen zeitgleich gehen.
+	- Tabellen in colspan in erster cell geht nicht...
+	- Bilder sollen auf Seite bleiben und nicht üergroß über Rand gehen
+
+Weiteres/Hinweise:
+
+ - Eclipse mit Edge
+   > https://stackoverflow.com/questions/52830856/how-to-use-windows-edge-browser-instead-of-ie-in-a-eclipse-swt-application
+   If you set -Dorg.eclipse.swt.browser.IEVersion=12001 in the eclipse.ini...
+
+Dependencies / Lizenz-Checks
+----------------------------
+
+Jodit 3.x												PRÜFEN !!!										https://xdsoft.net/jodit/v.2/license.html
++ ace (mode-html, theme*)								BSD, Ajax.org B.V.							https://github.com/ajaxorg/ace/blob/master/LICENSE
++ beautify												The MIT License (MIT)						https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.10.0/beautify.js
+es6-promise.map	(Promises/A+) 							hereby granted, free to charge, as is , ...	https://raw.githubusercontent.com/stefanpenner/es6-promise/master/LICENSE
+Velocity 2.2											Apache License 2.0
+Apache Commons Lang 3									Apache License 2.0
+jsoup 1.13												The MIT License (MIT)						http://jsoup.org/
+Apache FOP 2.3											Apache License 2.0
+Eclipse													EPL*
+

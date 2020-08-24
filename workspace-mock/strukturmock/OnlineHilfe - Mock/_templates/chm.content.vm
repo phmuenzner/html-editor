@@ -1,0 +1,45 @@
+#set( $dothtml = ".html" )
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	
+	<link rel="stylesheet" href="_styles/app.css"/>
+	
+	<title>$content.getTitle()</title>
+  </head>
+  <body>       
+    
+    <!-- headnav -->
+    <div class="topnav">
+    #if( $contentParent )
+      <span><a href="$contentParent.getFilename()"><img src="_images/arrow-up.png" alt="Nach Oben" /></a> </span>
+    #end
+        
+    #if( $contentPrev )
+      <span><a href="$contentPrev.getFilename()"><img src="_images/arrow-left.png" alt="Vorheriges" /></a> </span>
+    #end
+    
+    #if( $contentNext )
+      <span><a href="$contentNext.getFilename()"><img src="_images/arrow-right.png" alt="N&auml;chstes" /></a> </span>
+    #end
+    </div>
+    
+    <!-- content -->
+    <h$content.getNavLevel()>$content.getTitle()</h$content.getNavLevel()>
+    $ContentMetadata.textContentOf($content)
+        
+    
+    <!-- footer nav -->
+    #if( !$content.getSubContent().isEmpty() )
+    
+        <strong>Unterthemen in diesem Bereich</strong>
+	    #foreach($subContent in $content.getSubContent())
+	      <div><a href="$subContent.getFilename()">$subContent.getTitle()</a></div>
+	    #end
+	    
+    #end
+    
+  </body>
+</html>
+

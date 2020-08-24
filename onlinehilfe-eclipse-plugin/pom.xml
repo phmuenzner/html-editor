@@ -1,0 +1,103 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>onlinehilfe</groupId>
+		<artifactId>onlinehilfe</artifactId>
+		<version>1.0.0</version>
+	</parent>
+
+	<artifactId>onlinehilfe-eclipse-plugin</artifactId>
+	<packaging>eclipse-plugin</packaging>
+
+	<name>onlinehilfe-eclipse-plugin</name>
+	<dependencies>
+
+<!-- 		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>onlinehilfe-dependencies</artifactId>
+			<version>${project.version}</version>
+			<classifier>jar-with-dependencies</classifier>
+		</dependency>
+ -->
+ 
+		<!-- Maven hat sonst probleme beim bauen -->
+		<dependency>
+		    <groupId>org.eclipse.platform</groupId>
+		    <artifactId>org.eclipse.jface</artifactId>
+		    <version>3.20.0</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+	
+		<!-- Es ist nurn mal so bei PDE -->
+		<sourceDirectory>src</sourceDirectory>
+	
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.1</version>
+				<configuration>
+
+					<includeArtifactIds>onlinehilfe-dependencies</includeArtifactIds>
+
+					<outputDirectory>libs</outputDirectory>
+					<overWriteReleases>true</overWriteReleases>
+					<overWriteSnapshots>true</overWriteSnapshots>
+					<overWriteIfNewer>true</overWriteIfNewer>
+				</configuration>
+				<executions>
+					<execution>
+						<id>copy-dependencies</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+		<pluginManagement>
+			<plugins>
+				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.eclipse.tycho
+										</groupId>
+										<artifactId>
+											tycho-packaging-plugin
+										</artifactId>
+										<versionRange>
+											[1.7.0,)
+										</versionRange>
+										<goals>
+											<goal>
+												validate-version
+											</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+
+</project>
