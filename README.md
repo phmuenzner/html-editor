@@ -9,5 +9,12 @@ Set set environment variable `JAVA_HOME=C:\Development\java\jdk-14.0.2` and add 
 ### Maven
 Download Maven version 3.6.3 (or higher) and extract it into *C:\Development\apache-maven-3.6.3* (you may use a different folder).
 
+Download Maven version 3.6.3 (or higher) and extract it into *C:\Development\apache-maven-3.6.3* (you may use a different folder).
+
 ### HTML Help Workshop
 Download and install [HTML Help Workshop](https://www.microsoft.com/en-us/download/details.aspx?id=21138).
+
+```bash
+cd C:\Users\esultano\git\html-editor\
+mvn clean install
+```
