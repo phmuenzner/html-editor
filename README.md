@@ -9,12 +9,19 @@ Set set environment variable `JAVA_HOME=C:\Development\java\jdk-14.0.2` and add 
 ### Maven
 Download Maven version 3.6.3 (or higher) and extract it into *C:\Development\apache-maven-3.6.3* (you may use a different folder).
 
-Download Maven version 3.6.3 (or higher) and extract it into *C:\Development\apache-maven-3.6.3* (you may use a different folder).
-
-### HTML Help Workshop
-Download and install [HTML Help Workshop](https://www.microsoft.com/en-us/download/details.aspx?id=21138).
-
 ```bash
 cd C:\Users\esultano\git\html-editor\
 mvn clean install
 ```
+
+### HTML Help Workshop
+Download and install [HTML Help Workshop](https://www.microsoft.com/en-us/download/details.aspx?id=21138).
+
+## Run it
+In Eclipse run *onlinehilfe product.launch*. Then under *Window / Peferences / HTML Editor Preferences* set the following preferences:
+
+<img src="doc/html_editor_prefs.png" width="600">
+
+Then import the mock: *File / Import... / Existing Projects into Workspace /*, select the root directory *C:\Users\esultano\git\html-editor\workspace-mock* and finally import the project *OnlineHilfe - Mock*.
+
+<img src="doc/screenshot.png" width="600">
