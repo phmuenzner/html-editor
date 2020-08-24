@@ -22,6 +22,6 @@ In Eclipse run *onlinehilfe product.launch*. Then under *Window / Peferences / H
 
 <img src="doc/html_editor_prefs.png" width="600">
 
-Then import the mock: *File / Import... / Existing Projects into Workspace /*, select the root directory *C:\Users\esultano\git\html-editor\workspace-mock* and finally import the project *OnlineHilfe - Mock*.
+Then import the mock: *File / Import... / Existing Projects into Workspace /*, select the root directory *C:\Users\esultano\git\html-editor\workspace-mock* and finally select the project *OnlineHilfe - Mock* and click *Finish*.
 
 <img src="doc/screenshot.png" width="600">
