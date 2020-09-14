@@ -5,7 +5,7 @@
       <editor
             class="onlinehilfe.parts.HtmlEditor"
             extensions="html, htm"
-            icon="$nl$/icons/sample.gif"
+            icon="icons/sample.gif"
             id="onlinehilfe.parts.htmlEditor"
             name="JODID HTML Editor"
             default="true">
@@ -34,7 +34,7 @@
 	      <action
 	         	id="onlinehilfe.action.set.actionBuild1Html" 
 	         	label="Baut alles fertig" 
-	         	icon="$nl$/icons/buildHtml.gif"
+	         	icon="icons/buildHtml.gif"
 	         	tooltip="Erstellt HTML"
 	         	toolbarPath="Normal/additions"
 	         	class="onlinehilfe.action.BuildHtmlAction"> 
@@ -42,7 +42,7 @@
 	      <action
 	         	id="onlinehilfe.action.set.actionBuild2Chm" 
 	         	label="Baut alles fertig" 
-	         	icon="$nl$/icons/buildChm.gif"
+	         	icon="icons/buildChm.gif"
 	         	tooltip="Erstellt CHM"
 	         	toolbarPath="Normal/additions"
 	         	class="onlinehilfe.action.BuildChmAction"> 
@@ -50,7 +50,7 @@
 	      <action
 	         	id="onlinehilfe.action.set.actionBuild3Pdf" 
 	         	label="Baut alles fertig" 
-	         	icon="$nl$/icons/buildPdf.gif"
+	         	icon="icons/buildPdf.gif"
 	         	tooltip="Erstellt PDF"
 	         	toolbarPath="Normal/additions"
 	         	class="onlinehilfe.action.BuildPdfAction"> 
@@ -75,22 +75,25 @@
             labelProvider="onlinehilfe.navigator.OnlinehilfeNavigatorLabelProvider" 
             id="onlinehilfe.navigator.navigatorContent"
             icon="icons/nav.png"
-            name="Onlinehilfe Navigator Content">
-        <triggerPoints>
+            name="Onlinehilfe Project Content">
+         <triggerPoints>
 		    <or>
                <adapt type="org.eclipse.core.resources.IProject" >
                   <test property="org.eclipse.core.resources.projectNature" value="onlinehilfe.onlinehilfeNature"/>
 			   </adapt>
-		       
+			   
 		       <instanceof value="onlinehilfe.navigator.IOnlinehilfeElement"/>
                <instanceof value="org.eclipse.core.resources.IFile" />
-		       
+               <instanceof value="org.eclipse.core.resources.IFolder" />
+               <instanceof value="org.eclipse.core.resources.IProject" />
+               
 		    </or>
          </triggerPoints>
          <possibleChildren>
             <or>
                <instanceof value="onlinehilfe.navigator.IOnlinehilfeElement"/>
                <instanceof value="org.eclipse.core.resources.IFile"/>
+               <instanceof value="org.eclipse.core.resources.IFolder"/>
             </or>
          </possibleChildren>
          
@@ -120,11 +123,11 @@
       </viewerContentBinding>
    </extension>
 
-<extension point="org.eclipse.ui.viewActions"> 
-	<viewContribution id="org.eclipse.ui.articles.action.contribution.view" 
+   <extension point="org.eclipse.ui.viewActions"> 
+	  <viewContribution id="org.eclipse.ui.articles.action.contribution.view" 
 			targetID="org.eclipse.ui.navigator.ProjectExplorer">
 		<filter name="projectNature" 
-				value="onlinehilfeNature">
+				value="onlinehilfe-eclipse-plugin.onlinehilfeNature">
 		</filter>
 	    <action id="onlinehilfe.navigator.onlinehilfe.navigator.action.up" 
 	    		label="nach oben schieben"
@@ -179,8 +182,7 @@
         	</selection> 
 		</action>
 
-		
-	</viewContribution > 
-</extension>
+	  </viewContribution > 
+   </extension>
 
 </plugin>

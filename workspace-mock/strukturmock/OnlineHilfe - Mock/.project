@@ -7,6 +7,6 @@
 	<buildSpec>
 	</buildSpec>
 	<natures>
-		<nature>onlinehilfe.onlinehilfeNature</nature>
+		<nature>onlinehilfe-eclipse-plugin.onlinehilfeNature</nature>
 	</natures>
 </projectDescription>

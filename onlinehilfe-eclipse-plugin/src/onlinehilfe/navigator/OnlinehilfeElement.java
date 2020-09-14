@@ -13,23 +13,32 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceProxyVisitor;
 import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.ui.model.IWorkbenchAdapter;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import onlinehilfe.navigation.NavigationMetadata;
 import onlinehilfe.navigation.NavigationMetadataController;
 
 public class OnlinehilfeElement implements IOnlinehilfeElement { 
 
+	private static final Bundle BUNDLE = FrameworkUtil.getBundle(OnlinehilfeElement.class);
+	private static final ILog LOGGER = Platform.getLog(OnlinehilfeElement.class);
+	
 	private static final IOnlinehilfeElement[] NO_CHILDREN = new IOnlinehilfeElement[0];
+	
+	private static final String CONTENTFILE = "content.htm";
 		
 	private final IContainer containerDelegate;
 	private final ElementType elementType;
 	private final IOnlinehilfeElement parentOnlinehilfeElement;
 	
 	public OnlinehilfeElement(IContainer container, ElementType elementType, IOnlinehilfeElement parentOnlinehilfeElement) {
-		//System.out.println("      create OnlinehilfeElement("+container+", "+elementType+", "+parentOnlinehilfeElement+")");
+		LOGGER.info("      create OnlinehilfeElement("+container+", "+elementType+", "+parentOnlinehilfeElement+")");
 		
 		this.containerDelegate = container;
 		this.elementType = elementType;
@@ -151,14 +160,14 @@ public class OnlinehilfeElement implements IOnlinehilfeElement {
 		return null;
 	}
 	
-	/*package private*/ static Object mapElement(Object object, IOnlinehilfeElement parentOhe) {
+	public static Object mapElement(Object object, IOnlinehilfeElement parentOhe) {
 		
 		IOnlinehilfeElement mappedObject = mapValidElement(object, parentOhe);
 		
 		return (mappedObject!=null)?mappedObject:object;
 	}
 	
-	/*package private*/ static IOnlinehilfeElement mapValidElement(Object object, IOnlinehilfeElement parentOhe) {
+	private static IOnlinehilfeElement mapValidElement(Object object, IOnlinehilfeElement parentOhe) {
 		
 		if (object instanceof IFolder) {
 			IFolder folderObject = (IFolder)object;
@@ -211,7 +220,7 @@ public class OnlinehilfeElement implements IOnlinehilfeElement {
 	public IFile getContentFile() {
 		if (elementType == ElementType.NAVPOINT && containerDelegate instanceof IFolder) {
 			IFolder folder = (IFolder)containerDelegate;
-			return folder.getFile("content.htm");
+			return folder.getFile(CONTENTFILE);
 		}
 		return null;
 	}

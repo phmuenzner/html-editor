@@ -25,7 +25,7 @@ public class HtmlEditorPreferencePage extends FieldEditorPreferencePage implemen
 
 	public HtmlEditorPreferencePage() {
 		super(GRID);
-		setDescription("Preference page for HTML Editor");
+		setDescription("Einstellungen für Onlinehilfe");
 	}
 
 	/**
@@ -42,7 +42,7 @@ public class HtmlEditorPreferencePage extends FieldEditorPreferencePage implemen
 	@Override
 	public void init(IWorkbench workbench) {
 		// second parameter is typically the plug-in id
-		setPreferenceStore(new ScopedPreferenceStore(InstanceScope.INSTANCE, "onlinehilfe"));
+		setPreferenceStore(new ScopedPreferenceStore(InstanceScope.INSTANCE, PreferenceConstants.SCOPED_PREF_INSTANCE));
 	}
 
 }

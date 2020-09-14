@@ -3,6 +3,8 @@
 	<name>onlinehilfe-eclipse-plugin</name>
 	<comment></comment>
 	<projects>
+		<project>onlinehilfe-dependencies</project>
+		<project>onlinehilfe-eclipse-feature</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
@@ -27,8 +29,8 @@
 		</buildCommand>
 	</buildSpec>
 	<natures>
-		<nature>org.eclipse.m2e.core.maven2Nature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 		<nature>org.eclipse.pde.PluginNature</nature>
+		<nature>org.eclipse.m2e.core.maven2Nature</nature>
 	</natures>
 </projectDescription>

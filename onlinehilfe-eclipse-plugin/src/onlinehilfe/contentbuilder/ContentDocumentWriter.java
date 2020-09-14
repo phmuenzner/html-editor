@@ -22,8 +22,18 @@ import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.Platform;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
+
+import onlinehilfe.navigator.OnlinehilfeNavigatorContentProvider;
 
 public class ContentDocumentWriter {
+	
+	private static final Bundle BUNDLE = FrameworkUtil.getBundle(ContentDocumentWriter.class);
+	private static final ILog LOGGER = Platform.getLog(BUNDLE);
+	
 	private static final VelocityEngine ve = new VelocityEngine();
 	
 	private static final String VM_TEMPLATE_COVER = "cover.vm";
@@ -60,11 +70,11 @@ public class ContentDocumentWriter {
 	public void buildCover(Charset targetCharset) throws IOException {
 		
 		if (!(new File(templateDir, templatePrefix+VM_TEMPLATE_COVER)).exists()) {
-			System.out.println("Skip. Kein Cover-Template.");
+			LOGGER.info("Skip. Kein Cover-Template.");
 			return;
 		}
 		
-		System.out.println("Erstelle Cover-Document.");
+		LOGGER.info("Erstelle Cover-Document.");
 			
 		Map<String, Object> context = new HashMap<>();
 		Template contenTemplate = ve.getTemplate(templatePrefix+VM_TEMPLATE_COVER, FilesUtil.CHARSET_STRING);
@@ -74,16 +84,16 @@ public class ContentDocumentWriter {
 	public void buildFilelist(ContentMetadata contentMetadata, Charset targetCharset) throws IOException {
 		
 		if (!(new File(templateDir, templatePrefix+VM_TEMPLATE_FILELIST)).exists()) {
-			System.out.println("Skip. Kein Filelist-Template.");
+			LOGGER.info("Skip. Kein Filelist-Template.");
 			return;
 		}
 		
-		System.out.println("Erstelle FileList-Document.");
+		LOGGER.info("Erstelle FileList-Document.");
 		
 		List<String> filelist = buildFilelistInternal(contentMetadata);
 		
 		for (String string : filelist) {
-			System.out.println(string);
+			LOGGER.info(string);
 		}
 		
 		Map<String, Object> context = new HashMap<>();
@@ -112,11 +122,11 @@ public class ContentDocumentWriter {
 	public void buildToc(ContentMetadata contentMetadata, Charset targetCharset) throws IOException {
 		
 		if (!(new File(templateDir, templatePrefix+VM_TEMPLATE_TOC)).exists()) {
-			System.out.println("Skip. Kein ToC-Template.");
+			LOGGER.info("Skip. Kein ToC-Template.");
 			return;
 		}
 		
-		System.out.println("Erstelle ToC-Document.");
+		LOGGER.info("Erstelle ToC-Document.");
 
 		//ToC --> Table Of Contents, ich will nicht jedes mal Inhaltsverzeichnis schreiben
 		
@@ -145,18 +155,18 @@ public class ContentDocumentWriter {
 	}
 	
 	public void buildContent(ContentMetadata contentMetadata, Charset targetCharset) throws IOException {
-		System.out.println("Erstelle Content-Dokumente: " + contentMetadata.getTitle());
+		LOGGER.info("Erstelle Content-Dokumente: " + contentMetadata.getTitle());
 		
 		buildContent(contentMetadata, null, null, null, null, 0, targetCharset);
 	}
 		
 	public void buildContentcollection(ContentMetadata contentMetadata, Charset targetCharset) throws IOException {
 		if (!(new File(templateDir, templatePrefix+VM_TEMPLATE_CONTENTCOLLECTION)).exists()) {
-			System.out.println("Skip. Kein ContentCollection-Template.");
+			LOGGER.info("Skip. Kein ContentCollection-Template.");
 			return;
 		}
 		
-		System.out.println("Erstelle ContentCollection-Dokument als Sammeldokument der Content-Dokumente: " + contentMetadata.getTitle());
+		LOGGER.info("Erstelle ContentCollection-Dokument als Sammeldokument der Content-Dokumente: " + contentMetadata.getTitle());
 		
 		List<ContentMetadata> collectionList = new ArrayList<ContentMetadata>();
 		buildContent(contentMetadata, null, null, null, collectionList, 0, targetCharset);
@@ -188,11 +198,11 @@ public class ContentDocumentWriter {
 			if (collectionList==null) {
 				//wenn ich das template hier einmal brauche und es nicht da ist, dann sind die nachfolgenden schritte auch egal...
 				if (!(new File(templateDir, templatePrefix+VM_TEMPLATE_CONTENT)).exists()) {
-					System.out.println("Skip. Kein Content-Template.");
+					LOGGER.info("Skip. Kein Content-Template.");
 					return;
 				}
 				
-				System.out.println("Erstelle Content-Dokument: " + contentMetadata.getTitle());
+				LOGGER.info("Erstelle Content-Dokument: " + contentMetadata.getTitle());
 				
 				Map<String, Object> context = new HashMap<>();
 				context.put("content", contentMetadata);
@@ -210,7 +220,7 @@ public class ContentDocumentWriter {
 				Template contenTemplate = ve.getTemplate(templatePrefix+VM_TEMPLATE_CONTENT, FilesUtil.CHARSET_STRING);
 				writeContentToFile(buildOutputFileName(contentMetadata), contenTemplate, context, targetCharset);
 			} else {
-				System.out.println("Füge an Content-Dokument: " + contentMetadata.getTitle());
+				LOGGER.info("Füge an Content-Dokument: " + contentMetadata.getTitle());
 				collectionList.add(contentMetadata);
 			}
 		}

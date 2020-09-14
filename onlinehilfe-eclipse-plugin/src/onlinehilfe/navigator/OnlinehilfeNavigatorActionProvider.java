@@ -1,5 +1,7 @@
 package onlinehilfe.navigator;
 
+import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -11,10 +13,15 @@ import org.eclipse.ui.navigator.ICommonActionConstants;
 import org.eclipse.ui.navigator.ICommonActionExtensionSite;
 import org.eclipse.ui.navigator.ICommonViewerSite;
 import org.eclipse.ui.navigator.ICommonViewerWorkbenchSite;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import onlinehilfe.navigator.actions.OnlineHilfeContextActionGroup;
 
 public class OnlinehilfeNavigatorActionProvider extends SynchronizationActionProvider {
+	
+	private static final Bundle BUNDLE = FrameworkUtil.getBundle(OnlinehilfeNavigatorActionProvider.class);
+	private static final ILog LOGGER = Platform.getLog(OnlinehilfeNavigatorActionProvider.class);
 	
 	private OnlineHilfeContextActionGroup contextActions;
 	
@@ -24,7 +31,7 @@ public class OnlinehilfeNavigatorActionProvider extends SynchronizationActionPro
 		
 	@Override
 	public void init(ICommonActionExtensionSite aSite) {
-		System.out.println("OnlinehilfeNavigatorActionProvider call init("+aSite+")");
+		LOGGER.info("OnlinehilfeNavigatorActionProvider call init("+aSite+")");
 		
 		super.init(aSite);		
 		initOpenActions();				
@@ -35,7 +42,7 @@ public class OnlinehilfeNavigatorActionProvider extends SynchronizationActionPro
 		if (viewSite instanceof ICommonViewerWorkbenchSite) {
 			ICommonViewerWorkbenchSite commonViewerWorkbenchSite = (ICommonViewerWorkbenchSite) viewSite;
 			
-			System.out.println("commonViewerWorkbenchSite infos: " + commonViewerWorkbenchSite.getPage() + ", " + commonViewerWorkbenchSite.getSelectionProvider());
+			LOGGER.info("commonViewerWorkbenchSite infos: " + commonViewerWorkbenchSite.getPage() + ", " + commonViewerWorkbenchSite.getSelectionProvider());
 			
 			contextActions = new OnlineHilfeContextActionGroup(getActionSite().getStructuredViewer(), commonViewerWorkbenchSite);			
 		}

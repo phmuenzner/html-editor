@@ -5,7 +5,7 @@ import org.eclipse.ui.model.IWorkbenchAdapter;
 
 public class OnlinehilfeWorkbenchAdapter implements IWorkbenchAdapter {
 	
-	protected static final Object[] NO_CHILDREN= new Object[0];
+	protected static final Object[] NO_CHILDREN = new Object[0];
 	
 	@Override
 	public Object[] getChildren(Object o) {
