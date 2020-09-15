@@ -55,6 +55,7 @@ public class NewContentWizard extends Wizard {
 	
 	public class NewContentWizardPage extends WizardPage {
 		private Text textTitleText;
+		private Text textFilename;
 		private Composite container;
 		
 		public NewContentWizardPage() {
@@ -72,8 +73,8 @@ public class NewContentWizard extends Wizard {
 	        container.setLayout(layout);
 	        layout.numColumns = 2;
 	        
-	        Label label1 = new Label(container, SWT.NONE);
-	        label1.setText(wizardPageTitleLabel);
+	        Label labelTitleText = new Label(container, SWT.NONE);
+	        labelTitleText.setText(wizardPageTitleLabel);
 
 	        textTitleText = new Text(container, SWT.BORDER | SWT.SINGLE);
 	        	        

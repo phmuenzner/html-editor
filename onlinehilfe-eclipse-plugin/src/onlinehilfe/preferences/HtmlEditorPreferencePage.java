@@ -34,7 +34,6 @@ public class HtmlEditorPreferencePage extends FieldEditorPreferencePage implemen
 	 * editor knows how to save and restore itself.
 	 */
 	public void createFieldEditors() {
-		addField(new DirectoryFieldEditor(PreferenceConstants.JODIT_PATH, "Jodit Path:", getFieldEditorParent()));
 		addField(new IntegerFieldEditor(PreferenceConstants.JETTY_PORT, "Local Jetty Port:", getFieldEditorParent()));
 		addField(new FileFieldEditor(PreferenceConstants.HHC_PATH, "HHC Path:", getFieldEditorParent()));
 	}

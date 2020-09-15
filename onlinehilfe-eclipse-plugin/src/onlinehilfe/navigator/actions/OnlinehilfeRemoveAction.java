@@ -6,7 +6,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.navigator.CommonNavigator;
 
-import onlinehilfe.MessageBoxUtil;
+import onlinehilfe.dialogs.MessageBoxUtil;
 import onlinehilfe.navigation.NavigationMetadataController;
 import onlinehilfe.navigator.IOnlinehilfeElement;
 

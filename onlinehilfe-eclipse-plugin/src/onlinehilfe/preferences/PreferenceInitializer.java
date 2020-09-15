@@ -21,7 +21,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 	 */
 	public void initializeDefaultPreferences() {
 		ScopedPreferenceStore scopedPreferenceStore = new ScopedPreferenceStore(InstanceScope.INSTANCE, PreferenceConstants.SCOPED_PREF_INSTANCE);
-		scopedPreferenceStore.setDefault(PreferenceConstants.JODIT_PATH, new File("./web").getAbsolutePath());
 		scopedPreferenceStore.setDefault(PreferenceConstants.JETTY_PORT, "8291");
 		scopedPreferenceStore.setDefault(PreferenceConstants.HHC_PATH, new File("C:/Program Files (x86)/HTML Help Workshop/hhc.exe").getAbsolutePath());
 

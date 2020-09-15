@@ -20,15 +20,15 @@ import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.launch.Framework;
 
 import onlinehilfe.CurrentPropertiesStore;
-import onlinehilfe.MessageBoxUtil;
 import onlinehilfe.contentbuilder.ContentDocumentBuilder;
 import onlinehilfe.contentbuilder.FilesUtil;
 import onlinehilfe.contentbuilder.MetadataIdFilenameCreator;
+import onlinehilfe.dialogs.MessageBoxUtil;
 import onlinehilfe.preferences.PreferenceConstants;
 
 public class BuildChmAction extends ActionDelegate implements IWorkbenchWindowActionDelegate {
 
-	private IPreferenceStore preferenceStore = new ScopedPreferenceStore(InstanceScope.INSTANCE, "onlinehilfe");
+	private IPreferenceStore preferenceStore = new ScopedPreferenceStore(InstanceScope.INSTANCE, PreferenceConstants.SCOPED_PREF_INSTANCE);
 		
 	@Override
 	public void init(IWorkbenchWindow arg0) {

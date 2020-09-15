@@ -37,9 +37,9 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 
 import onlinehilfe.CurrentPropertiesStore;
-import onlinehilfe.MessageBoxUtil;
 import onlinehilfe.PropertiesEventListener;
 import onlinehilfe.contentbuilder.FilesUtil;
+import onlinehilfe.dialogs.MessageBoxUtil;
 import onlinehilfe.jetty.JettyServerHandler;
 import onlinehilfe.navigation.NavigationMetadata.NavigationMetadataComparator;
 import onlinehilfe.navigator.IOnlinehilfeElement;

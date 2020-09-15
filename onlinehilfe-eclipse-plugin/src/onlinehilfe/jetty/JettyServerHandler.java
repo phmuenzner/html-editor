@@ -121,8 +121,7 @@ public class JettyServerHandler {
 
 		@Override
 		public void propertyChange(PropertyChangeEvent arg0) {
-			if (PreferenceConstants.JODIT_PATH.equals(arg0.getProperty())
-					|| PreferenceConstants.JETTY_PORT.equals(arg0.getProperty())) {
+			if (PreferenceConstants.JETTY_PORT.equals(arg0.getProperty())) {
 				try {
 					stop();
 					start();
