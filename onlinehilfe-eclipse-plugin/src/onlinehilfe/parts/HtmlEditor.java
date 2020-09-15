@@ -103,7 +103,7 @@ public class HtmlEditor extends EditorPart {
 		
 		try {
 			NavigationMetadata navigationMetadata =  NavigationMetadataController.getInstance().getNavigationMetadataByIFolder((IFolder)(fileInput.getFile().getParent()));
-			if (navigationMetadata!=null) {
+			if (navigationMetadata != null) {
 				label.setText(navigationMetadata.getTitle());
 				setPartName(navigationMetadata.getTitle());
 			}
@@ -111,6 +111,7 @@ public class HtmlEditor extends EditorPart {
 		} catch (Exception e) {
 			LOGGER.error("Fehler in Jodit-Browser-Editor", e); //TODO raus oder Logger
 			label.setText(fileInput.getFile().getParent().getName());
+			setPartName(fileInput.getFile().getParent().getName());
 		}
 		
 	    label.setFont(new Font( label.getDisplay(), new FontData("Arial", 14, SWT.NONE)));
