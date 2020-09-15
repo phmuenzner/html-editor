@@ -17,11 +17,11 @@ import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.ui.actions.ActionDelegate;
 
 import onlinehilfe.CurrentPropertiesStore;
-import onlinehilfe.MessageBoxUtil;
 import onlinehilfe.contentbuilder.ContentDocumentBuilder;
 import onlinehilfe.contentbuilder.FilesUtil;
 import onlinehilfe.contentbuilder.Html2Pdf;
 import onlinehilfe.contentbuilder.MetadataEscapedTitleFilenameCreator;
+import onlinehilfe.dialogs.MessageBoxUtil;
 
 public class BuildPdfAction extends ActionDelegate implements IWorkbenchWindowActionDelegate {
 

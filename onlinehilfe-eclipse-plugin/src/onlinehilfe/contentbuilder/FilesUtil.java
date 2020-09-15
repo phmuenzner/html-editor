@@ -23,6 +23,8 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 public final class FilesUtil {
 	private FilesUtil() {}
 	
+	public static final int FILENAME_MAX_LENGTH = 35;
+	
 	public static final Charset CHARSET = StandardCharsets.UTF_8;
 	public static final String CHARSET_STRING = CHARSET.toString();
 
@@ -49,24 +51,7 @@ public final class FilesUtil {
 			}
 		}
 	}
-	
-	/*public static void copyFilesInDirectory(IFolder from, IFolder to) throws CoreException {
-		if(!to.exists()) {
-			createFolder(to);	
-		}
-		for (IResource fromMember : from.members()) {
-			if (fromMember instanceof IFolder) {
-				copyFilesInDirectory((IFolder)fromMember, appendFolder(to, fromMember.getName()));
-			} else if (fromMember instanceof IFile) {
-				IFile tofile = appendFile(to, fromMember.getName());
-				if (tofile.exists()) {
-					tofile.delete(true, new NullProgressMonitor());
-				}
-				tofile.create(((IFile)fromMember).getContents(), true, new NullProgressMonitor());
-			}
-		}
-	}*/
-	
+		
 	public static Properties readProjectProperties(IFolder folder) throws IOException, CoreException {
 		IFile projectPropertiesFile = folder.getProject().getFile(PROJECT_PROPERTIES_FILENAME);
 		Properties projectProperties = new Properties();
@@ -129,47 +114,8 @@ public final class FilesUtil {
 	    return directoryToBeDeleted.delete();
 	}
 	
-	//Achtung die Methode gibt es auch in der Migration
 	public static String buildFilenameFromTitle(final String title) {
-		if (title == null) {
-			return null;
-		}
-		
-		String text = title;
-		text = text
-				.replace("ä", "ae")
-				.replace("ö", "oe")
-				.replace("ü", "ue")
-				.replace("Ä", "Ae")
-				.replace("Ö", "Oe")
-				.replace("Ü", "Ue")
-				.replace("ß", "ss")
-				.replace("–", "-") // so n blöder langer "unstandardisierter" Bindestrich aus Word
-				.replaceAll("[~\"#%&*:<>?\\/\\\\\\{|\\}\\. ]", "_");
-		return text;
+		return MetadataEscapedTitleFilenameCreator.buildFilenameFromTitle(title, FILENAME_MAX_LENGTH);
 	}
-	
-//	// dass muss mal in eine Testklasse	
-//	private static void buildFilenameFromTitleTest() {
-//		assert(buildFilenameFromTitle(null) == null);
-//		
-//		System.out.println(buildFilenameFromTitle("äiöiü"));
-//		assert(buildFilenameFromTitle("äiöiü").equals("aeioeiue"));
-//				
-//		System.out.println(buildFilenameFromTitle("ÄiÖiÜiß"));
-//		assert(buildFilenameFromTitle("ÄiÖiÜiß").equals("AeiOeiUeiss"));
-//		
-//		System.out.println(buildFilenameFromTitle("/i\\i~i\"i%i&i*i:i<i>i?i{i}i|i."));
-//		assert(buildFilenameFromTitle("/i\\i~i\"i%i&i*i:i<i>i?i{i}i|i.").equals("_i_i_i_i_i_i_i_i_i_i_i_i_i_i_"));
-//		
-//		System.out.println(buildFilenameFromTitle("- –"));
-//		assert(buildFilenameFromTitle("-i i–").equals("-i_i-"));
-//		
-//		System.out.println(buildFilenameFromTitle("aouAOUs"));
-//		assert(buildFilenameFromTitle("aouAOUs").equals("aouAOUs"));
-//	}
-//	
-//	public static void main(String[] args) {
-//		buildFilenameFromTitleTest();
-//	}
+
 }

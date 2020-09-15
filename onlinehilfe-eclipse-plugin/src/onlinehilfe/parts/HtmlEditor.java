@@ -53,8 +53,8 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 
 import onlinehilfe.CurrentPropertiesStore;
-import onlinehilfe.MessageBoxUtil;
 import onlinehilfe.contentbuilder.FilesUtil;
+import onlinehilfe.dialogs.MessageBoxUtil;
 import onlinehilfe.navigation.NavigationMetadata;
 import onlinehilfe.navigation.NavigationMetadataController;
 import onlinehilfe.navigator.OnlinehilfeNavigatorContentProvider;

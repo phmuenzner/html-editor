@@ -14,7 +14,6 @@ public class PreferenceConstants {
 	
 	public static final String SCOPED_PREF_INSTANCE = BUNDLE.getSymbolicName();
 	
-	public static final String JODIT_PATH = "joditPathPreference";
 	public static final String JETTY_PORT = "jettyPort";
 	public static final String HHC_PATH = "hhcPathPreference";
 }

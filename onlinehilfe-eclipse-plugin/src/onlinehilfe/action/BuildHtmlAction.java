@@ -9,10 +9,10 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.ui.actions.ActionDelegate;
 
-import onlinehilfe.MessageBoxUtil;
 import onlinehilfe.contentbuilder.ContentDocumentBuilder;
 import onlinehilfe.contentbuilder.FilesUtil;
 import onlinehilfe.contentbuilder.MetadataEscapedTitleFilenameCreator;
+import onlinehilfe.dialogs.MessageBoxUtil;
 
 public class BuildHtmlAction extends ActionDelegate implements IWorkbenchWindowActionDelegate {
 
