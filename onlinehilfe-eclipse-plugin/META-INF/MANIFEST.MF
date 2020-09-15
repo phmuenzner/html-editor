@@ -27,7 +27,8 @@ Require-Bundle: javax.inject,
  org.apache.commons.codec;bundle-version="1.6.0",
  org.eclipse.team.core,
  org.eclipse.team.ui,
- org.eclipse.platform
+ org.eclipse.platform,
+ org.slf4j.api;bundle-version="1.7.2"
 Import-Package: javax.annotation;version="1.2.0"
 Automatic-Module-Name: onlinehilfe
 Bundle-Activator: onlinehilfe.Activator

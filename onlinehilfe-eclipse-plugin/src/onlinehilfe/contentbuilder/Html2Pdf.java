@@ -1,16 +1,11 @@
 package onlinehilfe.contentbuilder;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -28,8 +23,14 @@ import org.apache.fop.apps.FOPException;
 import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
 import org.apache.fop.apps.MimeConstants;
+import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.Platform;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document.OutputSettings.Syntax;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
+
+import onlinehilfe.navigator.OnlinehilfeNavigatorContentProvider;
 
 public class Html2Pdf {
 	

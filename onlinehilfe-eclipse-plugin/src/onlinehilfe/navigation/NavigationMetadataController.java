@@ -29,19 +29,28 @@ import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Platform;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import onlinehilfe.CurrentPropertiesStore;
 import onlinehilfe.MessageBoxUtil;
 import onlinehilfe.PropertiesEventListener;
 import onlinehilfe.contentbuilder.FilesUtil;
+import onlinehilfe.jetty.JettyServerHandler;
 import onlinehilfe.navigation.NavigationMetadata.NavigationMetadataComparator;
 import onlinehilfe.navigator.IOnlinehilfeElement;
 import onlinehilfe.navigator.IOnlinehilfeElement.ElementType;
 import onlinehilfe.navigator.OnlinehilfeElement;
 
 public class NavigationMetadataController implements PropertiesEventListener, IResourceChangeListener {
+
+	private static final Bundle BUNDLE = FrameworkUtil.getBundle(NavigationMetadataController.class);
+	private static final ILog LOGGER = Platform.getLog(BUNDLE);
+	
 	private static NavigationMetadataController uniqueInstance = null;
 	
 	private Map<IFolder, NavigationMetadata> navigationMetadatas = new ConcurrentHashMap<>();
@@ -93,7 +102,7 @@ public class NavigationMetadataController implements PropertiesEventListener, IR
 	}
 	
 	public void immediateDataRefresh() {
-		//System.out.println("immediateDataRefresh()");
+		//LOGGER.info("immediateDataRefresh()");
 		this.updateMetdaDataFromScheduler();
 	}
 	
@@ -266,7 +275,7 @@ public class NavigationMetadataController implements PropertiesEventListener, IR
 		
 		try {
 			readContentMetaDatasFromFolders(projectContainer);
-			//System.out.println("Verifying Order Integrity");
+			//LOGGER.info("Verifying Order Integrity");
 			try(UpdateMetadataSection update = new UpdateMetadataSection()) {
 				boolean shouldReload = this.verifyOrderIntegrity();
 				if (shouldReload) {
@@ -377,7 +386,7 @@ public class NavigationMetadataController implements PropertiesEventListener, IR
 	}
 	
 	private void readContentMetaDatasFromFolders(IContainer container) throws IOException, CoreException {
-		//System.out.println("readContentMetaDatasFromFolders("+container+")");
+		//LOGGER.info("readContentMetaDatasFromFolders("+container+")");
 		for(IResource member : container.members()) {
 			if (IFolder.FOLDER == (IFolder.FOLDER & member.getType())) {
 				if (!member.getName().startsWith("_") && !member.getName().startsWith(".")) {
@@ -423,12 +432,12 @@ public class NavigationMetadataController implements PropertiesEventListener, IR
 		NavigationMetadata navigationMetadata = navigationMetadatas.get(folder);
 				
 		if (navigationMetadata == null) {
-			System.out.println("Keine Daten für " + folder + " vorhanden.");
+			LOGGER.info("Keine Daten für " + folder + " vorhanden.");
 			return;
 		} 
 		
 		if (navigationMetadata.isHasChanges()) {
-			System.out.println("writeContentMetaDatasToFolders()" + folder);
+			LOGGER.info("writeContentMetaDatasToFolders()" + folder);
 			metaProperties.setProperty("contentTitle", navigationMetadata.getTitle());
 			metaProperties.setProperty("contentId", navigationMetadata.getId());
 			metaProperties.setProperty("contentOrder", Integer.toString(navigationMetadata.getOrder()));
@@ -444,7 +453,7 @@ public class NavigationMetadataController implements PropertiesEventListener, IR
 									
 			NavigationMetadata navigationMetadata = entry.getValue(); 
 			if (navigationMetadata.getId() == null) {
-				System.out.println("Das dürfte eigentlich nicht mehr passieren");
+				LOGGER.info("Das dürfte eigentlich nicht mehr passieren");
 				//navigationMetadata.setId(newContentId());
 				//navigationMetadata.setHasChanges(true);
 			}
@@ -455,7 +464,7 @@ public class NavigationMetadataController implements PropertiesEventListener, IR
 //			}
 			
 //			if (navigationMetadata.getOrder() <= 0) {
-//				System.out.println("Baue initiale Sortierung auf, das kann etwas dauern....");
+//				LOGGER.info("Baue initiale Sortierung auf, das kann etwas dauern....");
 //				
 //				Optional<Integer> maxOrder = navigationMetadatas.keySet().stream()
 //						.filter(f -> (entry.getKey().getParent().equals(f.getParent()))) //finde andere auf gleicher ordnerhöhe
@@ -481,7 +490,7 @@ public class NavigationMetadataController implements PropertiesEventListener, IR
 	}
 	
 	public NavigationMetadata getNavigationMetadataByIFolder(IFolder folder) {
-		//System.out.println("call getNavigationMetadataByIFolder("+folder+") --> " + navigationMetadatas.size() + ", " + navigationMetadatas.get(folder));
+		//LOGGER.info("call getNavigationMetadataByIFolder("+folder+") --> " + navigationMetadatas.size() + ", " + navigationMetadatas.get(folder));
 		return navigationMetadatas.get(folder);
 	}
 		
@@ -535,7 +544,7 @@ public class NavigationMetadataController implements PropertiesEventListener, IR
 						TimeUnit.SECONDS.sleep(SLEEP_SECONDS);
 					}
 					
-					//System.out.println("scheduler run");
+					//LOGGER.info("scheduler run");
 					updateMetdaDataFromScheduler();
 					
 					TimeUnit.SECONDS.sleep(SLEEP_SECONDS);

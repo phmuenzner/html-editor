@@ -1,7 +1,5 @@
 package onlinehilfe.navigator;
 
-import java.util.List;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -14,7 +12,7 @@ import onlinehilfe.navigation.NavigationMetadata;
 public interface IOnlinehilfeElement extends IAdaptable {
 	
 	public static enum ElementType {
-		NAVROOT, NAVPOINT /*, IMAGES, STYLES, TEMPLATES, TARGET, FOLDER, FILE*/;	
+		NAVROOT, NAVPOINT
 	}
 		
 	public ElementType getElementType();

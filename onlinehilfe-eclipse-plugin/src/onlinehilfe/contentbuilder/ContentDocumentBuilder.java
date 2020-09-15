@@ -6,12 +6,20 @@ import java.nio.charset.Charset;
 import java.util.Properties;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Platform;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import onlinehilfe.CurrentPropertiesStore;
+import onlinehilfe.navigator.OnlinehilfeNavigatorContentProvider;
 
 public class ContentDocumentBuilder {
-		
+	
+	private static final Bundle BUNDLE = FrameworkUtil.getBundle(OnlinehilfeNavigatorContentProvider.class);
+	private static final ILog LOGGER = Platform.getLog(BUNDLE);
+	
 	private final IPath projectLocation;
 	private final FilenameCreator filenameCreator;
 	private final String templatePrefix;
@@ -92,7 +100,7 @@ public class ContentDocumentBuilder {
 	}
 
 	private void fillContentMetadata(File dir, File content, String navName, ContentMetadata contentMetadata) {
-		System.out.println(
+		LOGGER.info(
 				"NavName: " + navName + "(" + dir.getName() + ", " + content.getName() + ", " + dir.getName() + ")");
 
 		try {

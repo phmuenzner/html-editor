@@ -15,8 +15,10 @@ import javax.inject.Named;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.Focus;
@@ -47,25 +49,32 @@ import org.eclipse.ui.IPathEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import onlinehilfe.CurrentPropertiesStore;
 import onlinehilfe.MessageBoxUtil;
 import onlinehilfe.contentbuilder.FilesUtil;
 import onlinehilfe.navigation.NavigationMetadata;
 import onlinehilfe.navigation.NavigationMetadataController;
+import onlinehilfe.navigator.OnlinehilfeNavigatorContentProvider;
 import onlinehilfe.preferences.PreferenceConstants;
 
 public class HtmlEditor extends EditorPart {
+	
+	private static final Bundle BUNDLE = FrameworkUtil.getBundle(HtmlEditor.class);
+	private static final ILog LOGGER = Platform.getLog(BUNDLE);
+	
 	private Browser browser;
 	private String currentPath;
-	private IPreferenceStore preferenceStore = new ScopedPreferenceStore(InstanceScope.INSTANCE, "onlinehilfe");
+	private IPreferenceStore preferenceStore = new ScopedPreferenceStore(InstanceScope.INSTANCE, PreferenceConstants.SCOPED_PREF_INSTANCE);
 	private boolean changedContentEditorStateIsDirty = false;
 
 	private IFileEditorInput fileInput;
 
 	@Override
 	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
-		System.out.println("init: " + site + ", " + input);
+		LOGGER.info("init: " + site + ", " + input);
 
 		setSite(site);
 		setInput(input);
@@ -80,12 +89,12 @@ public class HtmlEditor extends EditorPart {
 		CurrentPropertiesStore.getInstance().setProject(fileInput.getFile().getProject());
 		CurrentPropertiesStore.getInstance().setParent(fileInput.getFile().getParent());
 
-		System.out.println(input + " -- " + pInput.getPath().toPortableString());
+		LOGGER.info(input + " -- " + pInput.getPath().toPortableString());
 	}
 
 	@PostConstruct
 	public void createPartControl(Composite parent) {
-		System.out.println("createPartControl: " + parent.toString());
+		LOGGER.info("createPartControl: " + parent.toString());
 		
 		parent.setLayout(new BorderLayout());
 		
@@ -94,11 +103,15 @@ public class HtmlEditor extends EditorPart {
 		
 		try {
 			NavigationMetadata navigationMetadata =  NavigationMetadataController.getInstance().getNavigationMetadataByIFolder((IFolder)(fileInput.getFile().getParent()));
-			label.setText(navigationMetadata.getTitle());
-			setPartName(navigationMetadata.getTitle());
+			if (navigationMetadata != null) {
+				label.setText(navigationMetadata.getTitle());
+				setPartName(navigationMetadata.getTitle());
+			}
+			
 		} catch (Exception e) {
-			e.printStackTrace(); //TODO raus oder Logger
+			LOGGER.error("Fehler in Jodit-Browser-Editor", e); //TODO raus oder Logger
 			label.setText(fileInput.getFile().getParent().getName());
+			setPartName(fileInput.getFile().getParent().getName());
 		}
 		
 	    label.setFont(new Font( label.getDisplay(), new FontData("Arial", 14, SWT.NONE)));
@@ -119,7 +132,7 @@ public class HtmlEditor extends EditorPart {
 			// String uriString = uriWithLoadParam.toString();
 			browser.setUrl(uri.toString());
 		} catch (URISyntaxException e) {
-			e.printStackTrace();
+			LOGGER.error("Fehler in Jodit-Browser-Editor", e);
 		}
 
 		// content ins Script senden
@@ -145,7 +158,7 @@ public class HtmlEditor extends EditorPart {
 
 		} catch (Exception e) {
 			MessageBoxUtil.displayError("Beim Laden des Contents für \"%s\" ist ein Feher aufgetreten. Das tritt meistens auf, wenn der zu ladende Content nicht bzw. nicht mehr existiert.", e, fileInput.getFile().getParent().getName());
-			e.printStackTrace();
+			LOGGER.error("Fehler in Jodit-Browser-Editor", e);
 		}
 
 		BrowserEventListener browserEventListener = new BrowserEventListener();
@@ -156,7 +169,7 @@ public class HtmlEditor extends EditorPart {
 		browser.getDisplay().addListener(SWT.MouseDown, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
-				System.out.println(">> MouseDown " + event); 
+				LOGGER.info(">> MouseDown " + event); 
 			}
 		});
 		
@@ -223,13 +236,13 @@ public class HtmlEditor extends EditorPart {
 	@Inject
 	@Optional
 	public void setSelection(@Named(IServiceConstants.ACTIVE_SELECTION) Object[] selectedObjects) {
-		System.out.println("setSelection: " + Arrays.toString(selectedObjects));
+		LOGGER.info("setSelection: " + Arrays.toString(selectedObjects));
 
 	}
 
 	@Override
 	public void doSave(IProgressMonitor arg0) {
-		System.out.println("doSave: " + arg0);
+		LOGGER.info("doSave: " + arg0);
 
 		String content = String.valueOf(browser.evaluate("return evaluateContentToSave();"));
 
@@ -241,7 +254,7 @@ public class HtmlEditor extends EditorPart {
 			fileInput.getFile().refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.error("Fehler in Jodit-Browser-Editor", e);
 		}
 
 		checkChanged();
@@ -250,13 +263,13 @@ public class HtmlEditor extends EditorPart {
 
 	@Override
 	public boolean isDirty() {
-		//System.out.println("isDirty() --> " + changedContentEditorStateIsDirty);
+		//LOGGER.info("isDirty() --> " + changedContentEditorStateIsDirty);
 		return changedContentEditorStateIsDirty;
 	}
 
 	@Override
 	public void doSaveAs() {
-		System.out.println("doSaveAs");
+		LOGGER.info("doSaveAs");
 	}
 
 	@Override

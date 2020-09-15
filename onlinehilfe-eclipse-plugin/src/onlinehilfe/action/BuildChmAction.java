@@ -5,7 +5,9 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.IOUtils;
+import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -13,6 +15,9 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.ui.actions.ActionDelegate;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.launch.Framework;
 
 import onlinehilfe.CurrentPropertiesStore;
 import onlinehilfe.MessageBoxUtil;
@@ -24,7 +29,7 @@ import onlinehilfe.preferences.PreferenceConstants;
 public class BuildChmAction extends ActionDelegate implements IWorkbenchWindowActionDelegate {
 
 	private IPreferenceStore preferenceStore = new ScopedPreferenceStore(InstanceScope.INSTANCE, "onlinehilfe");
-	
+		
 	@Override
 	public void init(IWorkbenchWindow arg0) {
 

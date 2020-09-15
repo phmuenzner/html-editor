@@ -7,43 +7,52 @@ import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.ui.model.BaseWorkbenchContentProvider;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import onlinehilfe.CurrentPropertiesStore;
 import onlinehilfe.navigator.IOnlinehilfeElement.ElementType;
 
 public class OnlinehilfeNavigatorContentProvider extends BaseWorkbenchContentProvider {
 	
+	private static final Bundle BUNDLE = FrameworkUtil.getBundle(OnlinehilfeNavigatorContentProvider.class);
+	private static final ILog LOGGER = Platform.getLog(OnlinehilfeNavigatorContentProvider.class);
+	
+	public OnlinehilfeNavigatorContentProvider() {
+		super();
+		LOGGER.info("OnlinehilfeNavigatorContentProvider init...");
+	}
+	
 	@Override
 	public Object[] getChildren(Object parentElement) {
-		//System.out.println("call getChildren(" + parentElement + ")");
-		//System.out.println(Arrays.toString(Thread.currentThread().getStackTrace()));
+		LOGGER.info("call getChildren(" + parentElement + ")");
 		
 		
 		if (parentElement instanceof IProject) {
 			try {
+								
+				for (String s : ((IProject)parentElement).getDescription().getNatureIds()) {
+					LOGGER.info("NatureID: " + s);
+				}
 				
-				if (((IProject)parentElement).hasNature("onlinehilfe.onlinehilfeNature")) {
+				if (((IProject)parentElement).hasNature(OnlinehilfeNature.NATURE_ID)) {
 					CurrentPropertiesStore.getInstance().setProject((IProject)parentElement);
-					//System.out.println("ProjectNature: onlinehilfeNature found");
+					LOGGER.info("ProjectNature: onlinehilfeNature found");
 					List<Object> children = new ArrayList<Object>(Arrays.asList(super.getChildren(parentElement)));
 					children.add(new OnlinehilfeElement((IProject)parentElement, ElementType.NAVROOT, null));
 					return children.toArray();
 				}	
 			} catch (Exception e) {
-				e.printStackTrace();
+				LOGGER.error("Fehler beim Auflösen der Projektstruktur", e);
 			}	
 			
 		}
 		
-//		if (parentElement instanceof IProject) {
-//			System.out.println(" getChildren für IProject");
-//			return Arrays.asList(super.getChildren(parentElement)).stream().map(f -> OnlinehilfeElement.mapElement(f, null))
-//					.peek(f -> System.out.println("    " + f.toString()))
-//					.collect(Collectors.toList()).toArray();
-//		}
 		if (parentElement instanceof IOnlinehilfeElement) {
-			//System.out.println(" getChildren für IOnlinehilfeElement");
+			LOGGER.info("getChildren für IOnlinehilfeElement");
 			return Arrays.asList(super.getChildren(parentElement)).stream().map(f -> OnlinehilfeElement.mapElement(f, (IOnlinehilfeElement)parentElement))
 					//.peek(f -> System.out.println("    " + f.toString()))
 					.collect(Collectors.toList()).toArray();
@@ -56,19 +65,19 @@ public class OnlinehilfeNavigatorContentProvider extends BaseWorkbenchContentPro
 	
 	@Override
 	public Object[] getElements(Object element) {
-		//System.out.println("call getElements(" + element + ")");
+		LOGGER.info("call getElements(" + element + ")");
 		return getChildren(element);
 	}
 		
 	@Override
 	public Object getParent(Object element) {
-		//System.out.println("call getParent(" + element + ")");
+		LOGGER.info("call getParent(" + element + ")", new Throwable("dummy"));
 		return super.getParent(element);
 	}
 	
 	@Override
 	public boolean hasChildren(Object element) {
-		//System.out.println("call hasChildren(" + element + ")");
+		LOGGER.info("call hasChildren(" + element + ")");
 		
 		if (element instanceof OnlinehilfeElement && ((OnlinehilfeElement) element).getElementType() == ElementType.NAVPOINT) {
 			if (super.hasChildren(element)) {
