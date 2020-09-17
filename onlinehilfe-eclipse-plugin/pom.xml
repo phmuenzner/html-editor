@@ -36,6 +36,13 @@
 		<!-- Es ist nurn mal so bei PDE -->
 		<sourceDirectory>src</sourceDirectory>
 	
+	   <resources>
+     <resource>
+       <directory>web</directory>
+     </resource>
+   </resources>
+	
+	
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -59,30 +66,7 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
-			
-			
-			<plugin>
-			  <artifactId>maven-assembly-plugin</artifactId>
-			  <version>3.3.0</version>
-			  <configuration>
-			    <finalName>web</finalName>
-			    <appendAssemblyId>false</appendAssemblyId>
-			    <outputDirectory>${project.basedir}</outputDirectory>
-			    <descriptors>
-			      <descriptor>assembly/web-assembly.xml</descriptor>
-			    </descriptors>
-			  </configuration>
-			  <executions>
-			    <execution>
-			      <id>make-assembly</id>
-			      <phase>process-resources</phase>
-			      <goals>
-			        <goal>single</goal>
-			      </goals>
-			    </execution>
-			  </executions>
-			</plugin>
+			</plugin>		
 			
 		</plugins>
 		<pluginManagement>
