@@ -24,6 +24,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
@@ -56,7 +57,7 @@ public class NavigationMetadataController implements PropertiesEventListener, IR
 	private Map<IFolder, NavigationMetadata> navigationMetadatas = new ConcurrentHashMap<>();
 	private Set<String> contentIDs = new HashSet<>();
 	
-	private static final int SLEEP_SECONDS = 1; 
+	private static final int SLEEP_SECONDS = 5; 
 	
 	private boolean canUpdate = false;
 	
@@ -108,24 +109,27 @@ public class NavigationMetadataController implements PropertiesEventListener, IR
 	
 	public IOnlinehilfeElement renameElement(IOnlinehilfeElement selected, String newName) {
 		IOnlinehilfeElement parent = selected.getParentOnlinehilfeElement();
-		try {
+		try (UpdateMetadataSection updateMetadataSection = new UpdateMetadataSection()) {
 			NavigationMetadata metaData = navigationMetadatas.remove(selected.getIFolder());
-			metaData.setTitle(newName);
+			metaData.setTitle(newName);		
+			metaData.setHasChanges(true);
 			
+			String newFilename = FilesUtil.buildFilenameFromTitle(newName);
 			
-			IPath newPath = parent.getFullPath().append(newName);
-			selected.getIFolder().move(parent.getFullPath().append(newName), false, new NullProgressMonitor());
+			selected.getIFolder().move(parent.getFullPath().append(newFilename), false, new NullProgressMonitor());
 			
-			IFolder newFolder = selected.getParent().getFolder(newName);
+			IFolder newFolder = selected.getParent().getFolder(newFilename);
 			
 			navigationMetadatas.put(newFolder, metaData);
+			
+			writeOneMetaProperties(newFolder);
 			
 			//OnlineHilfeElememnt direkt ersetzen
 			selected = new OnlinehilfeElement(newFolder, selected.getElementType(), selected.getParentOnlinehilfeElement());
 			return selected;
 			
-		} catch (CoreException e) {
-			e.printStackTrace();
+		} catch (CoreException|IOException e) {
+			LOGGER.error("Fehler beim Umbenennen eines Elements.", e);
 		}
 		
 		return null;
@@ -166,7 +170,7 @@ public class NavigationMetadataController implements PropertiesEventListener, IR
 			return parent.findChildren(newName);
 			
 		} catch (CoreException|IOException e) {
-			e.printStackTrace();
+			LOGGER.error("Fehler beim Erstellen eines Elements.", e);
 		} finally {
 			this.immediateDataRefresh();	
 		}
@@ -188,7 +192,7 @@ public class NavigationMetadataController implements PropertiesEventListener, IR
 			return validMove;
 		
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.error("Fehler beim Verschieben eines Elements", e);
 		}
 		
 		return false;
@@ -234,7 +238,7 @@ public class NavigationMetadataController implements PropertiesEventListener, IR
 					: (selected.getParentOnlinehilfeElement() != null && selected.getParentOnlinehilfeElement().getElementType() == ElementType.NAVPOINT);
 			
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.error("Fehler beim Verschieben eines Elements.", e);
 		}
 		
 		return false;	
@@ -276,18 +280,17 @@ public class NavigationMetadataController implements PropertiesEventListener, IR
 		try {
 			readContentMetaDatasFromFolders(projectContainer);
 			//LOGGER.info("Verifying Order Integrity");
+			
 			try(UpdateMetadataSection update = new UpdateMetadataSection()) {
 				boolean shouldReload = this.verifyOrderIntegrity();
 				if (shouldReload) {
 					readContentMetaDatasFromFolders(projectContainer);
 				}
-				update.close();
 			}
 			initContentMetaDatas();
 			
 			writeContentMetaDatasToFolders();
 		} catch (Exception e) {
-			e.printStackTrace();
 			MessageBoxUtil.displayError("Fehler beim Initialisierung der Navigations-Metadaten", e);
 		}
 	}
@@ -386,12 +389,19 @@ public class NavigationMetadataController implements PropertiesEventListener, IR
 	}
 	
 	private void readContentMetaDatasFromFolders(IContainer container) throws IOException, CoreException {
-		//LOGGER.info("readContentMetaDatasFromFolders("+container+")");
+		//LOGGER.info("readContentMetaDatasFromFolders("+container+")", new Throwable("dummy"));
+		
+		if (IProject.FOLDER == (IProject.FOLDER & container.getType())) {
+			if (!container.getName().startsWith("_") && !container.getName().startsWith(".")) {
+				readOneMetaProperties((IFolder)container);
+			}
+		}
+		
 		for(IResource member : container.members()) {
 			if (IFolder.FOLDER == (IFolder.FOLDER & member.getType())) {
 				if (!member.getName().startsWith("_") && !member.getName().startsWith(".")) {
 					if (member instanceof IFolder) {
-						readOneMetaProperties((IFolder)member);
+						//readOneMetaProperties((IFolder)member);
 						readContentMetaDatasFromFolders((IFolder)member);
 					}
 				}
@@ -417,6 +427,8 @@ public class NavigationMetadataController implements PropertiesEventListener, IR
 			navigationMetadata.setOrder(Integer.valueOf(metaProperties.getProperty("contentOrder")));
 		}
 		
+		//LOGGER.info("readOneMetaProperties("+folder+") -- " + navigationMetadata.getTitle() + ", " + navigationMetadata.getId());
+		
 		navigationMetadatas.put(folder, navigationMetadata);
 	}
 	
@@ -432,12 +444,12 @@ public class NavigationMetadataController implements PropertiesEventListener, IR
 		NavigationMetadata navigationMetadata = navigationMetadatas.get(folder);
 				
 		if (navigationMetadata == null) {
-			LOGGER.info("Keine Daten für " + folder + " vorhanden.");
+			LOGGER.error("Keine Daten für " + folder + " vorhanden.");
 			return;
 		} 
 		
 		if (navigationMetadata.isHasChanges()) {
-			LOGGER.info("writeContentMetaDatasToFolders()" + folder);
+			//LOGGER.info("writeContentMetaDatasToFolders(" + folder + ") -- " + navigationMetadata.getTitle() + navigationMetadata.getId());
 			metaProperties.setProperty("contentTitle", navigationMetadata.getTitle());
 			metaProperties.setProperty("contentId", navigationMetadata.getId());
 			metaProperties.setProperty("contentOrder", Integer.toString(navigationMetadata.getOrder()));
@@ -453,7 +465,7 @@ public class NavigationMetadataController implements PropertiesEventListener, IR
 									
 			NavigationMetadata navigationMetadata = entry.getValue(); 
 			if (navigationMetadata.getId() == null) {
-				LOGGER.info("Das dürfte eigentlich nicht mehr passieren");
+				//LOGGER.info("Das dürfte eigentlich nicht mehr passieren");
 				//navigationMetadata.setId(newContentId());
 				//navigationMetadata.setHasChanges(true);
 			}
@@ -490,8 +502,19 @@ public class NavigationMetadataController implements PropertiesEventListener, IR
 	}
 	
 	public NavigationMetadata getNavigationMetadataByIFolder(IFolder folder) {
-		//LOGGER.info("call getNavigationMetadataByIFolder("+folder+") --> " + navigationMetadatas.size() + ", " + navigationMetadatas.get(folder));
-		return navigationMetadatas.get(folder);
+		//LOGGER.info("getNavigationMetadataByIFolder("+folder+")");
+		NavigationMetadata metaData = navigationMetadatas.get(folder);
+		if (metaData == null) {
+			try {
+				readContentMetaDatasFromFolders(folder);
+				metaData = navigationMetadatas.get(folder);
+			} catch (Exception e) {
+				LOGGER.error("Fehler beim Einlesen der Navigationsmetadaten.", e);
+			}
+				
+		}
+		
+		return metaData;
 	}
 		
 	public void terminate() {
@@ -564,7 +587,7 @@ public class NavigationMetadataController implements PropertiesEventListener, IR
 		
 		public void terminate() {
 			try {
-				executorService.awaitTermination(2*SLEEP_SECONDS, TimeUnit.SECONDS);	
+				executorService.awaitTermination(SLEEP_SECONDS+5, TimeUnit.SECONDS);	
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

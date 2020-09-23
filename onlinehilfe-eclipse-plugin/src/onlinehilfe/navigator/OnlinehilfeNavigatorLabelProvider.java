@@ -19,7 +19,7 @@ public class OnlinehilfeNavigatorLabelProvider extends BaseLabelProvider impleme
 	private static final ILog LOGGER = Platform.getLog(OnlinehilfeNavigatorLabelProvider.class);
 	
 	public String getText(Object element) {
-		LOGGER.info("call getText(" + element + ")");
+		//LOGGER.info("call getText(" + element + ")");
 		if (element !=null) {
 			if (element instanceof IOnlinehilfeElement) {
 				return ((IOnlinehilfeElement)element).getElementName();
@@ -29,7 +29,7 @@ public class OnlinehilfeNavigatorLabelProvider extends BaseLabelProvider impleme
 	}
 	
 	public Image getImage(Object element) {
-		LOGGER.info("call getImage(" + element + ")");
+		//LOGGER.info("call getImage(" + element + ")");
 		if (element instanceof IOnlinehilfeElement) {
 			ImageDescriptor imageDescriptor = null;
 			if (ElementType.NAVROOT == ((IOnlinehilfeElement)element).getElementType()) {

@@ -38,7 +38,7 @@ public class OnlinehilfeElement implements IOnlinehilfeElement {
 	private final IOnlinehilfeElement parentOnlinehilfeElement;
 	
 	public OnlinehilfeElement(IContainer container, ElementType elementType, IOnlinehilfeElement parentOnlinehilfeElement) {
-		LOGGER.info("      create OnlinehilfeElement("+container+", "+elementType+", "+parentOnlinehilfeElement+")");
+		//LOGGER.info("      create OnlinehilfeElement("+container+", "+elementType+", "+parentOnlinehilfeElement+") + ");
 		
 		this.containerDelegate = container;
 		this.elementType = elementType;
@@ -50,13 +50,19 @@ public class OnlinehilfeElement implements IOnlinehilfeElement {
 	}
 	
 	public String getElementName() {
+		//LOGGER.info("      getElementName() -- filename: " + containerDelegate.getName());
+		
 		if (ElementType.NAVROOT == this.getElementType()) {
 			return "Navigationbaum";
 		}
-		
+				
 		if (getNavigationMetadata() !=null) {
+			//LOGGER.info("                title found: " + getNavigationMetadata().getTitle());
+			
 			return getNavigationMetadata().getTitle();
 		}
+		
+		//LOGGER.info("                TITLE NOT FOUND");
 		
 		return containerDelegate.getName();
 	}
@@ -73,8 +79,8 @@ public class OnlinehilfeElement implements IOnlinehilfeElement {
 	public NavigationMetadata getNavigationMetadata() {
 		if (ElementType.NAVPOINT == this.getElementType()) {
 			if (containerDelegate instanceof IFolder) {
-				//System.out.println("call getNavigationMetadata() läuft..");
-				return NavigationMetadataController.getInstance().getNavigationMetadataByIFolder((IFolder)containerDelegate);	
+				NavigationMetadata metaData = NavigationMetadataController.getInstance().getNavigationMetadataByIFolder((IFolder)containerDelegate);
+				return metaData;	
 			}
 		}
 		
