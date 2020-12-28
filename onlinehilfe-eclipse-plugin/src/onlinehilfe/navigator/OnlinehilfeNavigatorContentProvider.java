@@ -28,19 +28,15 @@ public class OnlinehilfeNavigatorContentProvider extends BaseWorkbenchContentPro
 	
 	@Override
 	public Object[] getChildren(Object parentElement) {
-		LOGGER.info("call getChildren(" + parentElement + ")");
+		//LOGGER.info("call getChildren(" + parentElement + ")");
 		
 		
 		if (parentElement instanceof IProject) {
 			try {
-								
-				for (String s : ((IProject)parentElement).getDescription().getNatureIds()) {
-					LOGGER.info("NatureID: " + s);
-				}
 				
 				if (((IProject)parentElement).hasNature(OnlinehilfeNature.NATURE_ID)) {
 					CurrentPropertiesStore.getInstance().setProject((IProject)parentElement);
-					LOGGER.info("ProjectNature: onlinehilfeNature found");
+					//LOGGER.info("ProjectNature: onlinehilfeNature found");
 					List<Object> children = new ArrayList<Object>(Arrays.asList(super.getChildren(parentElement)));
 					children.add(new OnlinehilfeElement((IProject)parentElement, ElementType.NAVROOT, null));
 					return children.toArray();
@@ -52,7 +48,7 @@ public class OnlinehilfeNavigatorContentProvider extends BaseWorkbenchContentPro
 		}
 		
 		if (parentElement instanceof IOnlinehilfeElement) {
-			LOGGER.info("getChildren für IOnlinehilfeElement");
+			//LOGGER.info("getChildren für IOnlinehilfeElement");
 			return Arrays.asList(super.getChildren(parentElement)).stream().map(f -> OnlinehilfeElement.mapElement(f, (IOnlinehilfeElement)parentElement))
 					//.peek(f -> System.out.println("    " + f.toString()))
 					.collect(Collectors.toList()).toArray();
@@ -65,19 +61,19 @@ public class OnlinehilfeNavigatorContentProvider extends BaseWorkbenchContentPro
 	
 	@Override
 	public Object[] getElements(Object element) {
-		LOGGER.info("call getElements(" + element + ")");
+		//LOGGER.info("call getElements(" + element + ")");
 		return getChildren(element);
 	}
 		
 	@Override
 	public Object getParent(Object element) {
-		LOGGER.info("call getParent(" + element + ")", new Throwable("dummy"));
+		//LOGGER.info("call getParent(" + element + ")");
 		return super.getParent(element);
 	}
 	
 	@Override
 	public boolean hasChildren(Object element) {
-		LOGGER.info("call hasChildren(" + element + ")");
+		//LOGGER.info("call hasChildren(" + element + ")");
 		
 		if (element instanceof OnlinehilfeElement && ((OnlinehilfeElement) element).getElementType() == ElementType.NAVPOINT) {
 			if (super.hasChildren(element)) {
