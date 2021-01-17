@@ -2,12 +2,10 @@ package onlinehilfe.action;
 
 import java.io.File;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
+import java.util.Properties;
 
 import org.apache.commons.io.IOUtils;
-import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -15,9 +13,6 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.ui.actions.ActionDelegate;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.launch.Framework;
 
 import onlinehilfe.CurrentPropertiesStore;
 import onlinehilfe.contentbuilder.ContentDocumentBuilder;
@@ -56,10 +51,12 @@ public class BuildChmAction extends ActionDelegate implements IWorkbenchWindowAc
 				return;
 			}
 			
+			Properties projectProperties = FilesUtil.readProjectProperties(CurrentPropertiesStore.getInstance().getProject());
+			
 			//Bereite Contentbuilder vor
 			ContentDocumentBuilder documentBuilder = new ContentDocumentBuilder(new MetadataIdFilenameCreator(), "chm.", "_target-chm", "html");
 			
-			//Ermittle Arbeits- und Zielverzeichniss
+			//Ermittle Arbeits- und Zielverzeichnis
 			IPath innerTargetLocation = documentBuilder.getTargetLocation();
 			File targetLocation = innerTargetLocation.toFile().getParentFile();
 			
@@ -107,6 +104,17 @@ public class BuildChmAction extends ActionDelegate implements IWorkbenchWindowAc
 			if (outputFile.exists()) {
 				outputFile.renameTo(outputFileDst);
 			}
+			
+			//TODO: das muss noch umgebaut werden hier wird die contentcollection.html in die mapping.csv (oder wie auch immer genannt) umbenannt.
+			String contentcollectionNewName = projectProperties.getProperty("build.chm.contentcollection.targetfilename");
+			if (contentcollectionNewName != null && !contentcollectionNewName.isBlank()) {
+				File contentcollectionFile = new File(innerTargetLocation.toFile(), "_contentcollection.html");
+				File contentcollectionFileDst = new File(targetLocation, contentcollectionNewName);
+				if (contentcollectionFile.exists()) {
+					contentcollectionFile.renameTo(contentcollectionFileDst);
+				}	
+			}
+			
 			
 			//Arbeitsverzeichnis löschen
 			FilesUtil.deleteDirectory(innerTargetLocation.toFile());

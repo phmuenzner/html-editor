@@ -3,7 +3,10 @@ package onlinehilfe.contentbuilder;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.ILog;
@@ -13,6 +16,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 
 import onlinehilfe.CurrentPropertiesStore;
+import onlinehilfe.dialogs.NewContentWizard;
 import onlinehilfe.navigator.OnlinehilfeNavigatorContentProvider;
 
 public class ContentDocumentBuilder {
@@ -108,7 +112,15 @@ public class ContentDocumentBuilder {
 			contentMetadata.setTitle(metaProperties.getProperty("contentTitle"));
 			contentMetadata.setOrder(Integer.valueOf(metaProperties.getProperty("contentOrder", "-1")));
 			contentMetadata.setId(metaProperties.getProperty("contentId"));
-			contentMetadata.setContentFile(content); //TODO File raus machen		
+			contentMetadata.setContentFile(content); //TODO File raus machen
+			
+			Properties customFields = new Properties();
+			Map<Object, Object> customFieldEntries = metaProperties.entrySet().stream()
+					.filter(f -> ((String)(f.getKey())).startsWith(String.format(NewContentWizard.CUSTOM_FIELD_PREFIX_FORMAT, "")))
+					.collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+			
+			customFields.putAll(customFieldEntries);
+			contentMetadata.setCustomFields(customFields);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

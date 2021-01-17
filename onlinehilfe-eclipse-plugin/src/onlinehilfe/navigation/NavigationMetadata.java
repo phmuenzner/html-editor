@@ -1,14 +1,15 @@
 package onlinehilfe.navigation;
 
 import java.util.Comparator;
-
-import onlinehilfe.contentbuilder.ContentMetadata;
+import java.util.Map;
 
 public class NavigationMetadata {
 	private String title;
 	private String id;
 	private int order;
 	private boolean hasChanges;
+	private Map<Object, Object> customFields;
+	
 	public String getTitle() {
 		return title;
 	}
@@ -33,8 +34,14 @@ public class NavigationMetadata {
 	public void setHasChanges(boolean hasChanges) {
 		this.hasChanges = hasChanges;
 	}
+	public Map<Object, Object> getCustomFields() {
+		return customFields;
+	}
+	public void setCustomFields(Map<Object, Object> customFields) {
+		this.customFields = customFields;
+	}
 	
-	//Achtung der Compaerator hier und und Comparator in ContentMetadata sind an sich gleich und das muss auch so sein 
+	//Achtung der Comparator hier und der Comparator in ContentMetadata sind an sich gleich und das muss auch so sein 
 	public static class NavigationMetadataComparator implements Comparator<NavigationMetadata> {
 		@Override
 		public int compare(NavigationMetadata o1, NavigationMetadata o2) {

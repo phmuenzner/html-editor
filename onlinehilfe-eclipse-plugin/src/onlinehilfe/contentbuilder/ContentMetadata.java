@@ -8,12 +8,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
-
-import org.eclipse.core.runtime.ILog;
-import org.eclipse.core.runtime.Platform;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
 
 public class ContentMetadata {
 		
@@ -27,6 +23,7 @@ public class ContentMetadata {
 	private ContentMetadata parentContent;
 	private ContentMetadata previousContent;
 	private ContentMetadata nextContent;
+	private Map<Object, Object> customFields;
 	
 	public String getId() {
 		return id;
@@ -106,6 +103,14 @@ public class ContentMetadata {
 	
 	public ContentMetadata getNextContent() {
 		return nextContent;
+	}
+	
+	public void setCustomFields(Map<Object, Object> customFields) {
+		this.customFields = customFields;
+	}
+	
+	public Map<Object, Object> getCustomFields() {
+		return customFields;
 	}
 	
 	// vorübergehend

@@ -14,10 +14,9 @@ import java.util.Properties;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 
 public final class FilesUtil {
@@ -53,7 +52,11 @@ public final class FilesUtil {
 	}
 		
 	public static Properties readProjectProperties(IFolder folder) throws IOException, CoreException {
-		IFile projectPropertiesFile = folder.getProject().getFile(PROJECT_PROPERTIES_FILENAME);
+		return readProjectProperties(folder.getProject());
+	}
+
+	public static Properties readProjectProperties(IProject project) throws IOException, CoreException {
+		IFile projectPropertiesFile = project.getFile(PROJECT_PROPERTIES_FILENAME);
 		Properties projectProperties = new Properties();
 		if (projectPropertiesFile.exists()) {
 			try (InputStream in = projectPropertiesFile.getContents(true)) {
@@ -62,6 +65,7 @@ public final class FilesUtil {
 		}
 		return projectProperties;
 	}
+
 	
 	public static Properties readMetaProperties(IFolder folder) throws IOException, CoreException {
 		//System.out.println("readMetaProperties("+folder+")");
@@ -90,17 +94,15 @@ public final class FilesUtil {
 	}
 	
 	public static void writeMetaProperties(IFolder folder, Properties metaProperties) throws IOException, CoreException {
-		//System.out.println("writeMetaProperties("+folder+")");
 		IFile metaPropertiesFile = folder.getFile(META_PROPERTIES_FILENAME);
 	
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		metaProperties.store(out, "Nur Anpassen, wenn Sie wissen was sie tun!");
-		out.close(); //is eigentich egal hier
-		
-		if (metaPropertiesFile.exists()) {
-			metaPropertiesFile.setContents(new ByteArrayInputStream(out.toByteArray()), IResource.FORCE, new NullProgressMonitor());
-		} else {
-			metaPropertiesFile.create(new ByteArrayInputStream(out.toByteArray()), IResource.FORCE, new NullProgressMonitor());
+		try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+			PropertiesStoreWithoutDateUtil.store(metaProperties, out);		
+			if (metaPropertiesFile.exists()) {
+				metaPropertiesFile.setContents(new ByteArrayInputStream(out.toByteArray()), IResource.FORCE, new NullProgressMonitor());
+			} else {
+				metaPropertiesFile.create(new ByteArrayInputStream(out.toByteArray()), IResource.FORCE, new NullProgressMonitor());
+			}
 		}
 	}
 	

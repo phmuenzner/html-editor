@@ -1,0 +1,10 @@
+ID; Titel; Pflichtfeld; Weiters Feld; Bemerkung
+#foreach($content in $contents)
+#if($content.getCustomFields()["custom.content.field.hatZusatzinfo"])#*
+	  *#$content.getId(); #*
+	  *#"$content.getTitle()"; #*
+	  *#"#if($content.getCustomFields()["custom.content.field.pflichtfeld"])$content.getCustomFields()["custom.content.field.pflichtfeld"]#end"; #*
+	  *#"#if($content.getCustomFields()["custom.content.field.weiteresfeld"])$content.getCustomFields()["custom.content.field.weiteresfeld"]#end"; #*
+	  *#"#if($content.getCustomFields()["custom.content.field.bemerkungsfeld"])$content.getCustomFields()["custom.content.field.bemerkungsfeld"]#end"
+#end
+#end

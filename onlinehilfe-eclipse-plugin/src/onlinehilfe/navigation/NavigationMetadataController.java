@@ -2,16 +2,13 @@ package onlinehilfe.navigation;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
@@ -41,7 +38,6 @@ import onlinehilfe.CurrentPropertiesStore;
 import onlinehilfe.PropertiesEventListener;
 import onlinehilfe.contentbuilder.FilesUtil;
 import onlinehilfe.dialogs.MessageBoxUtil;
-import onlinehilfe.jetty.JettyServerHandler;
 import onlinehilfe.navigation.NavigationMetadata.NavigationMetadataComparator;
 import onlinehilfe.navigator.IOnlinehilfeElement;
 import onlinehilfe.navigator.IOnlinehilfeElement.ElementType;
@@ -107,23 +103,25 @@ public class NavigationMetadataController implements PropertiesEventListener, IR
 		this.updateMetdaDataFromScheduler();
 	}
 	
-	public IOnlinehilfeElement renameElement(IOnlinehilfeElement selected, String newName) {
+	public IOnlinehilfeElement renameElement(IOnlinehilfeElement selected, String newName, Map<Object, Object> customFields) {
 		IOnlinehilfeElement parent = selected.getParentOnlinehilfeElement();
 		try (UpdateMetadataSection updateMetadataSection = new UpdateMetadataSection()) {
 			NavigationMetadata metaData = navigationMetadatas.remove(selected.getIFolder());
 			metaData.setTitle(newName);		
 			metaData.setHasChanges(true);
+			metaData.setCustomFields(customFields);
 			
 			String newFilename = FilesUtil.buildFilenameFromTitle(newName);
 			
-			selected.getIFolder().move(parent.getFullPath().append(newFilename), false, new NullProgressMonitor());
+			if (!selected.getElementFilename().equals(newFilename)) {
+				System.out.println("umbenannt");
+				IPath newPath = parent.getFullPath().append(newFilename);
+				selected.getIFolder().move(newPath , false, new NullProgressMonitor());	
+			}
+			IFolder newFolder = getRenamedFolderByName(selected, newFilename);
 			
-			IFolder newFolder = selected.getParent().getFolder(newFilename);
-			
-			navigationMetadatas.put(newFolder, metaData);
-			
-			writeOneMetaProperties(newFolder);
-			
+			writeOneMetaProperties(newFolder, metaData);
+						
 			//OnlineHilfeElememnt direkt ersetzen
 			selected = new OnlinehilfeElement(newFolder, selected.getElementType(), selected.getParentOnlinehilfeElement());
 			return selected;
@@ -135,6 +133,15 @@ public class NavigationMetadataController implements PropertiesEventListener, IR
 		return null;
 	}
 	
+	private IFolder getRenamedFolderByName(IOnlinehilfeElement onlinehilfeElement, String name) {
+		IFolder parentFolder = onlinehilfeElement.getParent();
+		if (parentFolder == null) {
+			return onlinehilfeElement.getProject().getFolder(name);
+		}
+		return parentFolder.getFolder(name);
+		
+	}
+	
 	public void removeElement(IOnlinehilfeElement selected) {
 		try {
 			navigationMetadatas.remove(selected.getIFolder());
@@ -144,7 +151,7 @@ public class NavigationMetadataController implements PropertiesEventListener, IR
 		}
 	}
 	
-	public IOnlinehilfeElement newElement(IOnlinehilfeElement parent, String newName) throws CoreException {
+	public IOnlinehilfeElement newElement(IOnlinehilfeElement parent, String newName, Map<Object, Object> customFields) throws CoreException {
 		
 		String newFilename = FilesUtil.buildFilenameFromTitle(newName);
 		
@@ -164,8 +171,8 @@ public class NavigationMetadataController implements PropertiesEventListener, IR
 			newMetaData.setId(newContentId());
 			newMetaData.setOrder(newOrderId);
 			newMetaData.setTitle(newName);
-			navigationMetadatas.put(targetFolder, newMetaData);
-			writeOneMetaProperties(targetFolder);
+			newMetaData.setCustomFields(customFields);
+			writeOneMetaProperties(targetFolder, newMetaData);
 						
 			return parent.findChildren(newName);
 			
@@ -259,7 +266,7 @@ public class NavigationMetadataController implements PropertiesEventListener, IR
 				src.setOrder((neighbours.length>0)?(getNavigationMetadataByIFolder(neighbours[neighbours.length - 1].getIFolder()).getOrder()+1):0);
 				src.setHasChanges(true);
 				
-				writeOneMetaProperties(selectedFolder);
+				writeOneMetaProperties(selectedFolder, src);
 				
 				IPath toPath = (moveIn) ? dest.getFullPath(): dest.getParentOnlinehilfeElement().getFullPath();
 				
@@ -279,7 +286,6 @@ public class NavigationMetadataController implements PropertiesEventListener, IR
 		
 		try {
 			readContentMetaDatasFromFolders(projectContainer);
-			//LOGGER.info("Verifying Order Integrity");
 			
 			try(UpdateMetadataSection update = new UpdateMetadataSection()) {
 				boolean shouldReload = this.verifyOrderIntegrity();
@@ -287,7 +293,6 @@ public class NavigationMetadataController implements PropertiesEventListener, IR
 					readContentMetaDatasFromFolders(projectContainer);
 				}
 			}
-			initContentMetaDatas();
 			
 			writeContentMetaDatasToFolders();
 		} catch (Exception e) {
@@ -433,62 +438,34 @@ public class NavigationMetadataController implements PropertiesEventListener, IR
 	}
 	
 	private void writeContentMetaDatasToFolders() throws IOException, CoreException {
-		for (IFolder folder: navigationMetadatas.keySet()) {
-			writeOneMetaProperties(folder);
+		for (Entry<IFolder, NavigationMetadata> entry: navigationMetadatas.entrySet()) {
+			writeOneMetaProperties(entry.getKey(), entry.getValue());
 		}
 	}
 		
-	private void writeOneMetaProperties(IFolder folder) throws IOException, CoreException {
-		Properties metaProperties = FilesUtil.readMetaProperties(folder);
-		
-		NavigationMetadata navigationMetadata = navigationMetadatas.get(folder);
-				
+	private void writeOneMetaProperties(IFolder folder, NavigationMetadata navigationMetadata) throws IOException, CoreException {
+						
 		if (navigationMetadata == null) {
-			LOGGER.error("Keine Daten für " + folder + " vorhanden.");
+			LOGGER.error("Keine Daten für " + folder + " angegeben.");
 			return;
 		} 
 		
-		if (navigationMetadata.isHasChanges()) {
+//		if (navigationMetadata.isHasChanges()) {
+			Properties metaProperties = FilesUtil.readMetaProperties(folder);
+			
 			//LOGGER.info("writeContentMetaDatasToFolders(" + folder + ") -- " + navigationMetadata.getTitle() + navigationMetadata.getId());
 			metaProperties.setProperty("contentTitle", navigationMetadata.getTitle());
 			metaProperties.setProperty("contentId", navigationMetadata.getId());
 			metaProperties.setProperty("contentOrder", Integer.toString(navigationMetadata.getOrder()));
-			
-			FilesUtil.writeMetaProperties(folder, metaProperties);
-		}
-		
-	}
-
-	
-	private void initContentMetaDatas() {
-		for (Entry<IFolder, NavigationMetadata> entry : navigationMetadatas.entrySet()) {
-									
-			NavigationMetadata navigationMetadata = entry.getValue(); 
-			if (navigationMetadata.getId() == null) {
-				//LOGGER.info("Das dürfte eigentlich nicht mehr passieren");
-				//navigationMetadata.setId(newContentId());
-				//navigationMetadata.setHasChanges(true);
+			if (navigationMetadata.getCustomFields()!=null) {
+				metaProperties.putAll(navigationMetadata.getCustomFields());
 			}
 			
-//			if (!entry.getKey().getName().equals(navigationMetadata.getTitle())) {
-//				navigationMetadata.setTitle(entry.getKey().getName());
-//				navigationMetadata.setHasChanges(true);
-//			}
+			FilesUtil.writeMetaProperties(folder, metaProperties);
 			
-//			if (navigationMetadata.getOrder() <= 0) {
-//				LOGGER.info("Baue initiale Sortierung auf, das kann etwas dauern....");
-//				
-//				Optional<Integer> maxOrder = navigationMetadatas.keySet().stream()
-//						.filter(f -> (entry.getKey().getParent().equals(f.getParent()))) //finde andere auf gleicher ordnerhöhe
-//						.filter(f-> !entry.equals(f)) // sortiert sich selbst aus
-//						.map(f -> navigationMetadatas.get(f).getOrder()) //maped auf order aus value
-//						.filter(f -> (f != -1)) //alle order != -1
-//						.max(Integer::compare);
-//				navigationMetadata.setOrder((maxOrder.isPresent()) ? maxOrder.get()+1 : 1);
-//				navigationMetadata.setHasChanges(true);
-//			}
-			
-		}
+			navigationMetadatas.put(folder, navigationMetadata);
+//		}
+		
 	}
 	
 	private synchronized String newContentId() {
